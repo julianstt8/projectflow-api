@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Sprints;
 using ProjectFlow.Domain.Tasks;
 using ProjectFlow.Infrastructure.Persistence;
@@ -13,7 +14,8 @@ public sealed class ApplicationDbContextModelTests : IDisposable
         new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql("Host=localhost;Database=projectflow_model_tests")
             .UseSnakeCaseNamingConvention()
-            .Options);
+            .Options,
+        new TestCurrentOrganization(null));
 
     public void Dispose() => _dbContext.Dispose();
 
@@ -34,6 +36,20 @@ public sealed class ApplicationDbContextModelTests : IDisposable
             Assert.True(
                 entityType.ConstructorBinding is not null,
                 $"{entityType.ClrType.Name} has no constructor EF Core can bind to."));
+    }
+
+    [Theory]
+    [InlineData(typeof(IOrganizationOwned), ApplicationDbContext.OrganizationFilter)]
+    [InlineData(typeof(ISoftDeletable), ApplicationDbContext.SoftDeleteFilter)]
+    public void Entities_implementing_a_marker_interface_have_its_query_filter(Type markerInterface, string filterKey)
+    {
+        var entityTypes = _dbContext.Model.GetEntityTypes()
+            .Where(entityType => markerInterface.IsAssignableFrom(entityType.ClrType))
+            .ToList();
+
+        Assert.NotEmpty(entityTypes);
+        Assert.All(entityTypes, entityType =>
+            Assert.Contains(entityType.GetDeclaredQueryFilters(), filter => filter.Key == filterKey));
     }
 
     [Fact]

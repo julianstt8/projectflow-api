@@ -1,5 +1,7 @@
 using Mediator;
+using ProjectFlow.Api.Organizations;
 using ProjectFlow.Application;
+using ProjectFlow.Application.Abstractions;
 using ProjectFlow.Application.Behaviors;
 using ProjectFlow.Infrastructure;
 using ProjectFlow.Infrastructure.Persistence;
@@ -9,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentOrganization, RouteCurrentOrganization>();
 
 builder.Services.AddMediator((MediatorOptions options) =>
 {

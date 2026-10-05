@@ -2,7 +2,7 @@ using ProjectFlow.Domain.Common;
 
 namespace ProjectFlow.Domain.Projects;
 
-public sealed class Project : Entity
+public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
 {
     public const int NameMaxLength = 100;
     public const int DescriptionMaxLength = 2000;

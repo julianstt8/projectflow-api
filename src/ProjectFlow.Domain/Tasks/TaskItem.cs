@@ -7,7 +7,7 @@ using ProjectFlow.Domain.Sprints;
 namespace ProjectFlow.Domain.Tasks;
 
 /// <summary>A unit of work in a project. Named <c>TaskItem</c> to avoid clashing with <see cref="System.Threading.Tasks.Task"/>.</summary>
-public sealed class TaskItem : Entity
+public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
 {
     public const int TitleMaxLength = 200;
     public const int DescriptionMaxLength = 10000;

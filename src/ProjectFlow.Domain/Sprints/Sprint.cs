@@ -3,7 +3,7 @@ using ProjectFlow.Domain.Projects;
 
 namespace ProjectFlow.Domain.Sprints;
 
-public sealed class Sprint : Entity
+public sealed class Sprint : Entity, IOrganizationOwned
 {
     public const int NameMaxLength = 100;
     public const int GoalMaxLength = 500;

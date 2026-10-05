@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using ProjectFlow.Application.Abstractions;
 
 namespace ProjectFlow.Infrastructure.Persistence;
 
@@ -16,6 +17,11 @@ internal sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<A
             .UseSnakeCaseNamingConvention()
             .Options;
 
-        return new ApplicationDbContext(options);
+        return new ApplicationDbContext(options, new NoCurrentOrganization());
+    }
+
+    private sealed class NoCurrentOrganization : ICurrentOrganization
+    {
+        public Guid? OrganizationId => null;
     }
 }

@@ -3,7 +3,7 @@ using ProjectFlow.Domain.Tasks;
 
 namespace ProjectFlow.Domain.Comments;
 
-public sealed class Comment : Entity
+public sealed class Comment : Entity, IOrganizationOwned
 {
     public const int BodyMaxLength = 5000;
 

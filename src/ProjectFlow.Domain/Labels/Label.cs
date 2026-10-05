@@ -4,7 +4,7 @@ using ProjectFlow.Domain.Projects;
 
 namespace ProjectFlow.Domain.Labels;
 
-public sealed partial class Label : Entity
+public sealed partial class Label : Entity, IOrganizationOwned
 {
     public const int NameMaxLength = 50;
 
