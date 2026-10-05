@@ -6,6 +6,7 @@ public enum ErrorType
     Validation,
     NotFound,
     Conflict,
+    Forbidden,
 }
 
 public sealed record Error(string Code, string Description, ErrorType Type)
@@ -17,4 +18,6 @@ public sealed record Error(string Code, string Description, ErrorType Type)
     public static Error NotFound(string code, string description) => new(code, description, ErrorType.NotFound);
 
     public static Error Conflict(string code, string description) => new(code, description, ErrorType.Conflict);
+
+    public static Error Forbidden(string code, string description) => new(code, description, ErrorType.Forbidden);
 }
