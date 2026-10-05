@@ -10,5 +10,6 @@
     <Project Path="tests/ProjectFlow.Application.Tests/ProjectFlow.Application.Tests.csproj" />
     <Project Path="tests/ProjectFlow.ArchitectureTests/ProjectFlow.ArchitectureTests.csproj" />
     <Project Path="tests/ProjectFlow.Domain.Tests/ProjectFlow.Domain.Tests.csproj" />
+    <Project Path="tests/ProjectFlow.Infrastructure.Tests/ProjectFlow.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>

@@ -43,6 +43,12 @@ dotnet test
 dotnet run --project src/ProjectFlow.Api
 ```
 
+Docker Compose applies the database migrations on startup. To run the API outside Docker, start only the database (`docker compose up db`) and set the connection string with user-secrets:
+
+```bash
+dotnet user-secrets set ConnectionStrings:Default "Host=localhost;Port=5432;Database=projectflow;Username=projectflow;Password=projectflow_dev" --project src/ProjectFlow.Api
+```
+
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
@@ -77,6 +83,12 @@ Con el [SDK de .NET 10](https://dotnet.microsoft.com/download):
 dotnet build
 dotnet test
 dotnet run --project src/ProjectFlow.Api
+```
+
+Docker Compose aplica las migraciones de la base de datos al arrancar. Para ejecutar la API fuera de Docker, levanta solo la base de datos (`docker compose up db`) y configura la cadena de conexión con user-secrets:
+
+```bash
+dotnet user-secrets set ConnectionStrings:Default "Host=localhost;Port=5432;Database=projectflow;Username=projectflow;Password=projectflow_dev" --project src/ProjectFlow.Api
 ```
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.

@@ -22,6 +22,7 @@ services:
     build: .
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      Database__MigrateOnStartup: "true"
       ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB:-projectflow};Username=${POSTGRES_USER:-projectflow};Password=${POSTGRES_PASSWORD:-projectflow_dev}
     ports:
       - "${API_PORT:-5080}:8080"

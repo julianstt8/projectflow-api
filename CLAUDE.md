@@ -42,6 +42,19 @@ dotnet format                 # CI runs `dotnet format --verify-no-changes`
 docker compose up --build     # API on http://localhost:5080 + PostgreSQL
 ```
 
+### Database (EF Core)
+
+```bash
+dotnet tool restore           # installs the local dotnet-ef tool
+dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --startup-project src/ProjectFlow.Api --output-dir Persistence/Migrations
+```
+
+- Tables and columns are snake_case (`EFCore.NamingConventions`); enums are stored as text.
+- Entities are materialized through their constructors: constructor parameter names must match property names.
+- Every model change needs a migration; `ProjectFlow.Infrastructure.Tests` fails if one is missing.
+- Migrations run on startup only in Development with `Database:MigrateOnStartup=true` (set by docker-compose).
+- Running the API outside Docker needs `ConnectionStrings:Default`, e.g. `dotnet user-secrets set ConnectionStrings:Default "<connection string>" --project src/ProjectFlow.Api`.
+
 ## Rules
 
 - Code, commits, issues and PRs in **English**. Public docs (README, docs/) bilingual EN/ES.
