@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.IdentityModel.JsonWebTokens;
 using ProjectFlow.Api.Controllers;
 using ProjectFlow.Api.IntegrationTests.Infrastructure;
+using ProjectFlow.Application.Authentication;
 using ProjectFlow.Application.Authentication.Login;
 using ProjectFlow.Application.Authentication.Register;
 
@@ -65,7 +66,7 @@ public class AuthEndpointsTests(ProjectFlowApiFactory api)
 
         var login = await _client.PostAsJsonAsync("/api/auth/login", new LoginCommand(email, Password));
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
-        var token = await login.Content.ReadFromJsonAsync<AccessTokenResponse>();
+        var token = await login.Content.ReadFromJsonAsync<TokenResponse>();
         Assert.NotNull(token);
         Assert.Equal("Bearer", token.TokenType);
 
@@ -137,7 +138,7 @@ public class AuthEndpointsTests(ProjectFlowApiFactory api)
     {
         var response = await _client.PostAsJsonAsync("/api/auth/login", new LoginCommand(email, Password));
         response.EnsureSuccessStatusCode();
-        return (await response.Content.ReadFromJsonAsync<AccessTokenResponse>())!.AccessToken;
+        return (await response.Content.ReadFromJsonAsync<TokenResponse>())!.AccessToken;
     }
 
     private static async Task<JsonElement> ReadProblemAsync(HttpResponseMessage response) =>

@@ -12,5 +12,8 @@ internal sealed class UserRepository(ApplicationDbContext dbContext) : IUserRepo
     public Task<User?> GetByEmailAsync(Email email, CancellationToken cancellationToken) =>
         dbContext.Users.SingleOrDefaultAsync(user => user.Email == email, cancellationToken);
 
+    public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
+        dbContext.Users.SingleOrDefaultAsync(user => user.Id == id, cancellationToken);
+
     public void Add(User user) => dbContext.Users.Add(user);
 }
