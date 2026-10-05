@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using ProjectFlow.Application.Abstractions;
 using ProjectFlow.Application.Abstractions.Persistence;
 using ProjectFlow.Infrastructure.Authentication;
+using ProjectFlow.Infrastructure.Authorization;
 using ProjectFlow.Infrastructure.Persistence;
+using ProjectFlow.Infrastructure.Persistence.Queries;
 using ProjectFlow.Infrastructure.Persistence.Repositories;
 using ProjectFlow.Infrastructure.Persistence.Seeding;
 
@@ -27,6 +29,9 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+        services.AddScoped<IOrganizationQueries, OrganizationQueries>();
+        services.AddScoped<IOrganizationMembership, OrganizationMembership>();
 
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
