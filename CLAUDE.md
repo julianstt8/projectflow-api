@@ -56,6 +56,14 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Demo data (`Persistence/Seeding/DevelopmentDataSeeder.cs`) is loaded only in Development with `Database:SeedOnStartup=true`, once (idempotent). Build it through domain methods, never with raw inserts.
 - Running the API outside Docker needs `ConnectionStrings:Default`, e.g. `dotnet user-secrets set ConnectionStrings:Default "<connection string>" --project src/ProjectFlow.Api`.
 
+## Tests
+
+- `ProjectFlow.Domain.Tests` / `ProjectFlow.Application.Tests`: fast unit tests, no I/O.
+- `ProjectFlow.Infrastructure.Tests`: EF Core model checks (no database) plus query filters and seeding against PostgreSQL.
+- `ProjectFlow.Api.IntegrationTests`: the real API (`ProjectFlowApiFactory`) against PostgreSQL; covers migrations, constraints and concurrency, and later the HTTP endpoints.
+- PostgreSQL tests use **Testcontainers** (throwaway `postgres:17-alpine` per test run), so **Docker must be running** for `dotnet test`. Never use the EF in-memory provider.
+- Tests that need a database share one container per assembly through an xUnit collection fixture; use unique values (`TestData.Unique()`) instead of cleaning tables.
+
 ## Rules
 
 - Code, commits, issues and PRs in **English**. Public docs (README, docs/) bilingual EN/ES.

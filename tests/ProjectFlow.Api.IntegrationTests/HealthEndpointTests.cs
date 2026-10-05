@@ -1,15 +1,15 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
+using ProjectFlow.Api.IntegrationTests.Infrastructure;
 
 namespace ProjectFlow.Api.IntegrationTests;
 
-public class HealthEndpointTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+[Collection(ApiCollection.Name)]
+public class HealthEndpointTests(ProjectFlowApiFactory api)
 {
     [Fact]
     public async Task Get_health_returns_healthy()
     {
-        using var client = factory.CreateClient();
+        using var client = api.CreateClient();
 
         var response = await client.GetAsync("/health");
 
