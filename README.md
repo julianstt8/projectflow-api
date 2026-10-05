@@ -63,6 +63,17 @@ In Development, Docker Compose also loads fictional demo data (once): two organi
 | frank.admin@example.com | Globex admin, project manager (DATA) |
 | grace.dev@example.com | Developer (DATA) |
 
+### Authentication
+
+Every endpoint requires a JWT access token except registration, login and the health check:
+
+```bash
+curl -X POST http://localhost:5080/api/auth/login -H "Content-Type: application/json"   -d '{"email":"ana.admin@example.com","password":"ProjectFlow-Dev-2026"}'
+curl http://localhost:5080/api/auth/me -H "Authorization: Bearer <accessToken>"
+```
+
+Tokens last 15 minutes. The signing key comes from configuration (`Jwt:SigningKey`, at least 32 characters) via user-secrets or environment variables and is never committed. In Development, if no key is set, a random one is generated on startup (tokens stop working after a restart); in any other environment the API does not start without a valid key.
+
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
@@ -108,5 +119,11 @@ dotnet user-secrets set ConnectionStrings:Default "Host=localhost;Port=5432;Data
 ### Datos de ejemplo
 
 En Development, Docker Compose también carga datos de ejemplo ficticios (una sola vez): dos organizaciones (**Acme Software** y **Globex Corporation**), tres proyectos con sprints, épicas, etiquetas, tareas en todos los estados y comentarios. Todos los usuarios de ejemplo entran con la contraseña `ProjectFlow-Dev-2026` (solo para desarrollo local); la tabla de usuarios y roles está en la sección en inglés.
+
+### Autenticación
+
+Todos los endpoints exigen un token JWT, excepto el registro, el login y el health check. Ejemplo con `curl` en la sección en inglés.
+
+Los tokens duran 15 minutos. La clave de firma viene de la configuración (`Jwt:SigningKey`, mínimo 32 caracteres) mediante user-secrets o variables de entorno y nunca se sube al repositorio. En Development, si no hay clave, se genera una aleatoria al arrancar (los tokens dejan de valer al reiniciar); en cualquier otro entorno la API no arranca sin una clave válida.
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.
