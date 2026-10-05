@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ProjectFlow.Infrastructure.Persistence.Seeding;
 
 namespace ProjectFlow.Infrastructure.Persistence;
 
@@ -12,5 +13,14 @@ public static class DatabaseMigrationExtensions
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         await dbContext.Database.MigrateAsync(cancellationToken);
+    }
+
+    /// <summary>Inserts the fake development data if it is not there yet. Meant for local development only.</summary>
+    public static async Task SeedDevelopmentDataAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+    {
+        await using var scope = services.CreateAsyncScope();
+        var seeder = scope.ServiceProvider.GetRequiredService<DevelopmentDataSeeder>();
+
+        await seeder.SeedAsync(cancellationToken);
     }
 }

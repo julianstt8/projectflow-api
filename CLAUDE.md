@@ -53,6 +53,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Entities are materialized through their constructors: constructor parameter names must match property names.
 - Every model change needs a migration; `ProjectFlow.Infrastructure.Tests` fails if one is missing.
 - Migrations run on startup only in Development with `Database:MigrateOnStartup=true` (set by docker-compose).
+- Demo data (`Persistence/Seeding/DevelopmentDataSeeder.cs`) is loaded only in Development with `Database:SeedOnStartup=true`, once (idempotent). Build it through domain methods, never with raw inserts.
 - Running the API outside Docker needs `ConnectionStrings:Default`, e.g. `dotnet user-secrets set ConnectionStrings:Default "<connection string>" --project src/ProjectFlow.Api`.
 
 ## Rules
