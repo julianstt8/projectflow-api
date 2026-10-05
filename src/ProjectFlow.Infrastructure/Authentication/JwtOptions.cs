@@ -26,6 +26,9 @@ public sealed class JwtOptions
     [Range(1, 60)]
     public int AccessTokenLifetimeMinutes { get; init; } = 15;
 
+    [Range(1, 90)]
+    public int RefreshTokenLifetimeDays { get; init; } = 7;
+
     /// <summary>Key used both to sign tokens and to validate them.</summary>
     public SymmetricSecurityKey GetSigningKey() => new(Encoding.UTF8.GetBytes(SigningKey));
 }

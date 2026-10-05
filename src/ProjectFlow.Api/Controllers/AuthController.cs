@@ -2,7 +2,10 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+using ProjectFlow.Application.Authentication;
 using ProjectFlow.Application.Authentication.Login;
+using ProjectFlow.Application.Authentication.Logout;
+using ProjectFlow.Application.Authentication.Refresh;
 using ProjectFlow.Application.Authentication.Register;
 
 namespace ProjectFlow.Api.Controllers;
@@ -25,10 +28,10 @@ public sealed class AuthController(ISender sender) : ApiControllerBase
             : ErrorResult(result.Error);
     }
 
-    /// <summary>Exchanges e-mail and password for a short-lived access token (RF-01).</summary>
+    /// <summary>Exchanges e-mail and password for a short-lived access token and a refresh token (RF-01).</summary>
     [AllowAnonymous]
     [HttpPost("login")]
-    [ProducesResponseType<AccessTokenResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<TokenResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login(LoginCommand command, CancellationToken cancellationToken)
@@ -36,6 +39,31 @@ public sealed class AuthController(ISender sender) : ApiControllerBase
         var result = await sender.Send(command, cancellationToken);
 
         return result.IsSuccess ? Ok(result.Value) : ErrorResult(result.Error);
+    }
+
+    /// <summary>Exchanges a refresh token for a new token pair. The refresh token can be used only once.</summary>
+    [AllowAnonymous]
+    [HttpPost("refresh")]
+    [ProducesResponseType<TokenResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Refresh(RefreshTokenCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        return result.IsSuccess ? Ok(result.Value) : ErrorResult(result.Error);
+    }
+
+    /// <summary>Ends the session of the refresh token. Anonymous, so it works after the access token expired.</summary>
+    [AllowAnonymous]
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Logout(LogoutCommand command, CancellationToken cancellationToken)
+    {
+        await sender.Send(command, cancellationToken);
+
+        return NoContent();
     }
 
     /// <summary>The user identified by the access token.</summary>

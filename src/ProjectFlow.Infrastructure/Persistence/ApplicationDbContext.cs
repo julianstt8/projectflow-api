@@ -25,6 +25,8 @@ public sealed class ApplicationDbContext(
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public DbSet<Organization> Organizations => Set<Organization>();
 
     public DbSet<Project> Projects => Set<Project>();

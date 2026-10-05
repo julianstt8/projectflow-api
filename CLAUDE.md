@@ -62,6 +62,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Access tokens carry only `sub`, `email`, `name` and `jti`. **Never put roles in the token**: they are resolved per request from the database (PRD 4.1).
 - Controllers inherit `ApiControllerBase`, send a command/query through `ISender` and return `ErrorResult(result.Error)` on failure (ProblemDetails with a `code` extension). Validation failures from the Mediator pipeline become 400 via `ValidationExceptionHandler`.
 - Mediator handlers must be `public` (the source generator runs in the Api project).
+- Refresh tokens: one family per login, rotated on every use, family revoked on reuse; stored only as SHA-256. `IUnitOfWork` turns EF concurrency errors into `ConcurrencyConflictException` (409 via `ConcurrencyConflictExceptionHandler`, or handled by the use case).
 - Handlers use ports from `Application/Abstractions` (`IUserRepository`, `IUnitOfWork`, `IPasswordHasher`, `IAccessTokenGenerator`, `TimeProvider`); never `ApplicationDbContext` directly.
 
 ## Tests
