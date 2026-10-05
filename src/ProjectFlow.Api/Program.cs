@@ -1,4 +1,6 @@
 using Mediator;
+using ProjectFlow.Api.Authentication;
+using ProjectFlow.Api.ErrorHandling;
 using ProjectFlow.Api.Organizations;
 using ProjectFlow.Application;
 using ProjectFlow.Application.Abstractions;
@@ -22,9 +24,12 @@ builder.Services.AddMediator((MediatorOptions options) =>
     options.PipelineBehaviors = [typeof(ValidationBehavior<,>)];
 });
 
+builder.AddJwtAuthentication();
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
@@ -34,7 +39,7 @@ app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 
     if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
     {
@@ -49,10 +54,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();
 

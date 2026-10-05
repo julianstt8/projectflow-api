@@ -56,6 +56,14 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Demo data (`Persistence/Seeding/DevelopmentDataSeeder.cs`) is loaded only in Development with `Database:SeedOnStartup=true`, once (idempotent). Build it through domain methods, never with raw inserts.
 - Running the API outside Docker needs `ConnectionStrings:Default`, e.g. `dotnet user-secrets set ConnectionStrings:Default "<connection string>" --project src/ProjectFlow.Api`.
 
+## API conventions
+
+- **Secure by default**: a fallback authorization policy requires an authenticated user on every endpoint. Mark public endpoints with `[AllowAnonymous]` explicitly.
+- Access tokens carry only `sub`, `email`, `name` and `jti`. **Never put roles in the token**: they are resolved per request from the database (PRD 4.1).
+- Controllers inherit `ApiControllerBase`, send a command/query through `ISender` and return `ErrorResult(result.Error)` on failure (ProblemDetails with a `code` extension). Validation failures from the Mediator pipeline become 400 via `ValidationExceptionHandler`.
+- Mediator handlers must be `public` (the source generator runs in the Api project).
+- Handlers use ports from `Application/Abstractions` (`IUserRepository`, `IUnitOfWork`, `IPasswordHasher`, `IAccessTokenGenerator`, `TimeProvider`); never `ApplicationDbContext` directly.
+
 ## Tests
 
 - `ProjectFlow.Domain.Tests` / `ProjectFlow.Application.Tests`: fast unit tests, no I/O.
