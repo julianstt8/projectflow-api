@@ -17,6 +17,10 @@ public class LayerDependencyTests
         { Application, Infrastructure },
         { Application, Api },
         { Infrastructure, Api },
+        { Domain, "Mediator.Abstractions" },
+        { Domain, "FluentValidation" },
+        { Domain, "Microsoft.EntityFrameworkCore" },
+        { Domain, "Microsoft.AspNetCore.Http.Abstractions" },
     };
 
     [Theory]
