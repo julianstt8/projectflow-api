@@ -3,7 +3,7 @@ using ProjectFlow.Domain.Projects;
 
 namespace ProjectFlow.Domain.Epics;
 
-public sealed class Epic : Entity
+public sealed class Epic : Entity, IOrganizationOwned
 {
     public const int NameMaxLength = 200;
     public const int DescriptionMaxLength = 5000;
