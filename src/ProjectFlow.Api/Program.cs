@@ -40,6 +40,11 @@ if (app.Environment.IsDevelopment())
     {
         await app.Services.ApplyMigrationsAsync();
     }
+
+    if (app.Configuration.GetValue<bool>("Database:SeedOnStartup"))
+    {
+        await app.Services.SeedDevelopmentDataAsync();
+    }
 }
 
 app.UseHttpsRedirection();

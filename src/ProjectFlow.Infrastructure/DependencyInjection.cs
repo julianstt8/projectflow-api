@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using ProjectFlow.Application.Abstractions;
+using ProjectFlow.Infrastructure.Authentication;
 using ProjectFlow.Infrastructure.Persistence;
+using ProjectFlow.Infrastructure.Persistence.Seeding;
 
 namespace ProjectFlow.Infrastructure;
 
@@ -18,6 +22,10 @@ public static class DependencyInjection
                 ?? throw new InvalidOperationException(
                     $"Connection string '{PersistenceConstants.ConnectionStringName}' is not configured."))
             .UseSnakeCaseNamingConvention());
+
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<DevelopmentDataSeeder>();
 
         return services;
     }

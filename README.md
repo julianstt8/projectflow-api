@@ -49,6 +49,20 @@ Docker Compose applies the database migrations on startup. To run the API outsid
 dotnet user-secrets set ConnectionStrings:Default "Host=localhost;Port=5432;Database=projectflow;Username=projectflow;Password=projectflow_dev" --project src/ProjectFlow.Api
 ```
 
+### Demo data
+
+In Development, Docker Compose also loads fictional demo data (once): two organizations (**Acme Software** and **Globex Corporation**), three projects with sprints, epics, labels, tasks in every status and comments. Every demo user signs in with the password `ProjectFlow-Dev-2026` (local development only):
+
+| User | Role |
+|---|---|
+| ana.admin@example.com | Acme admin |
+| bruno.pm@example.com | Project manager (WEB, MOB) |
+| carla.dev@example.com | Developer at Acme, viewer at Globex |
+| diego.dev@example.com | Developer (WEB) |
+| elena.viewer@example.com | Viewer (WEB) |
+| frank.admin@example.com | Globex admin, project manager (DATA) |
+| grace.dev@example.com | Developer (DATA) |
+
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
@@ -90,5 +104,9 @@ Docker Compose aplica las migraciones de la base de datos al arrancar. Para ejec
 ```bash
 dotnet user-secrets set ConnectionStrings:Default "Host=localhost;Port=5432;Database=projectflow;Username=projectflow;Password=projectflow_dev" --project src/ProjectFlow.Api
 ```
+
+### Datos de ejemplo
+
+En Development, Docker Compose también carga datos de ejemplo ficticios (una sola vez): dos organizaciones (**Acme Software** y **Globex Corporation**), tres proyectos con sprints, épicas, etiquetas, tareas en todos los estados y comentarios. Todos los usuarios de ejemplo entran con la contraseña `ProjectFlow-Dev-2026` (solo para desarrollo local); la tabla de usuarios y roles está en la sección en inglés.
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.
