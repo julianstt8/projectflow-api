@@ -2,12 +2,13 @@ using Mediator;
 using ProjectFlow.Application;
 using ProjectFlow.Application.Behaviors;
 using ProjectFlow.Infrastructure;
+using ProjectFlow.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddApplication()
-    .AddInfrastructure();
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddMediator((MediatorOptions options) =>
 {
@@ -29,6 +30,11 @@ app.UseStatusCodePages();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+    {
+        await app.Services.ApplyMigrationsAsync();
+    }
 }
 
 app.UseHttpsRedirection();

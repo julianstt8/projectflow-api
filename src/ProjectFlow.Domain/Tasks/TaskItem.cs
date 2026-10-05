@@ -34,7 +34,7 @@ public sealed class TaskItem : Entity
         string title,
         string? description,
         TaskPriority priority,
-        DateTimeOffset now)
+        DateTimeOffset createdAt)
         : base(id)
     {
         ProjectId = projectId;
@@ -46,8 +46,8 @@ public sealed class TaskItem : Entity
         Description = description;
         Priority = priority;
         Status = TaskItemStatus.ToDo;
-        CreatedAt = now;
-        UpdatedAt = now;
+        CreatedAt = createdAt;
+        UpdatedAt = createdAt;
     }
 
     public Guid ProjectId { get; }
