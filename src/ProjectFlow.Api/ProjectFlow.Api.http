@@ -1,0 +1,5 @@
+@ProjectFlow.Api_HostAddress = http://localhost:5089
+
+GET {{ProjectFlow.Api_HostAddress}}/health
+
+###
