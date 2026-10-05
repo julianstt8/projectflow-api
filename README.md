@@ -27,7 +27,15 @@ tests/
 
 ## Getting started
 
-Requirements: [.NET 10 SDK](https://dotnet.microsoft.com/download).
+With Docker (API + PostgreSQL, no other setup needed):
+
+```bash
+docker compose up --build
+```
+
+The API listens on http://localhost:5080 (health check: `GET /health`). Local defaults can be overridden with a `.env` file based on `.env.example`.
+
+With the [.NET 10 SDK](https://dotnet.microsoft.com/download):
 
 ```bash
 dotnet build
@@ -35,7 +43,7 @@ dotnet test
 dotnet run --project src/ProjectFlow.Api
 ```
 
-Health check: `GET /health`.
+CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
 
@@ -55,7 +63,15 @@ Cuatro capas con dependencias hacia adentro: `Api` → `Application` → `Domain
 
 ### Cómo ejecutarlo
 
-Requisitos: [SDK de .NET 10](https://dotnet.microsoft.com/download).
+Con Docker (API + PostgreSQL, sin más configuración):
+
+```bash
+docker compose up --build
+```
+
+La API queda en http://localhost:5080 (health check: `GET /health`). Los valores locales por defecto se pueden cambiar con un archivo `.env` basado en `.env.example`.
+
+Con el [SDK de .NET 10](https://dotnet.microsoft.com/download):
 
 ```bash
 dotnet build
@@ -63,4 +79,4 @@ dotnet test
 dotnet run --project src/ProjectFlow.Api
 ```
 
-Health check: `GET /health`.
+El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.

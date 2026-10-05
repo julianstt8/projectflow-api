@@ -38,6 +38,8 @@ New Mediator handlers in Application are picked up because `Program.cs` sets `op
 dotnet build
 dotnet test
 dotnet run --project src/ProjectFlow.Api
+dotnet format                 # CI runs `dotnet format --verify-no-changes`
+docker compose up --build     # API on http://localhost:5080 + PostgreSQL
 ```
 
 ## Rules

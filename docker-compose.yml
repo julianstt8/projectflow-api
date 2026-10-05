@@ -1,0 +1,33 @@
+# Local development stack: `docker compose up --build`
+# Default credentials are for local development only. Override them in a `.env` file (see .env.example).
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-projectflow}
+      POSTGRES_USER: ${POSTGRES_USER:-projectflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-projectflow_dev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB:-projectflow};Username=${POSTGRES_USER:-projectflow};Password=${POSTGRES_PASSWORD:-projectflow_dev}
+    ports:
+      - "${API_PORT:-5080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:
