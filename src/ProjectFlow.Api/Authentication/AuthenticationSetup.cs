@@ -1,9 +1,12 @@
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using ProjectFlow.Api.Authorization;
+using ProjectFlow.Application.Abstractions;
 using ProjectFlow.Infrastructure.Authentication;
 
 namespace ProjectFlow.Api.Authentication;
@@ -43,7 +46,12 @@ internal static class AuthenticationSetup
             });
 
         builder.Services.AddAuthorizationBuilder()
-            .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build())
+            .AddOrganizationPolicies();
+
+        builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+        builder.Services.AddScoped<IAuthorizationHandler, OrganizationRoleHandler>();
+        builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, OrganizationAuthorizationResultHandler>();
 
         return builder;
     }

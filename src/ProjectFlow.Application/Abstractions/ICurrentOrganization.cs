@@ -5,8 +5,8 @@ namespace ProjectFlow.Application.Abstractions;
 /// filtered by it; when it is <see langword="null"/>, no organization-owned data is returned.
 /// </summary>
 /// <remarks>
-/// The value comes from the request and is not trusted by itself: authorization (#10, #11) must verify
-/// that the current user is a member of this organization before any handler runs.
+/// The value comes from the request route. It is trusted only because every organization-scoped endpoint
+/// is protected by an organization policy that checks the current user is a member (see the Api project).
 /// </remarks>
 public interface ICurrentOrganization
 {

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Mediator;
 using ProjectFlow.Api.Authentication;
 using ProjectFlow.Api.ErrorHandling;
@@ -26,7 +27,8 @@ builder.Services.AddMediator((MediatorOptions options) =>
 
 builder.AddJwtAuthentication();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ValidationExceptionHandler>();

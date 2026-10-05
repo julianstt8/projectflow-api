@@ -74,6 +74,10 @@ curl http://localhost:5080/api/auth/me -H "Authorization: Bearer <accessToken>"
 
 Access tokens last 15 minutes. Login also returns a **refresh token** (7 days): `POST /api/auth/refresh` exchanges it for a new pair and it works only once (rotation); replaying an already used refresh token revokes the whole session. `POST /api/auth/logout` ends the session. Only a SHA-256 hash of refresh tokens is stored. The signing key comes from configuration (`Jwt:SigningKey`, at least 32 characters) via user-secrets or environment variables and is never committed. In Development, if no key is set, a random one is generated on startup (tokens stop working after a restart); in any other environment the API does not start without a valid key.
 
+### Organizations
+
+A user can belong to several organizations as `Admin` or `Member` (`/api/organizations`): whoever creates an organization becomes its admin; admins add members by e-mail, change roles and remove members; any member can leave. The last admin can never be removed or demoted. Users who are not members get `404` for an organization, so they cannot even tell it exists.
+
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
@@ -125,5 +129,9 @@ En Development, Docker Compose también carga datos de ejemplo ficticios (una so
 Todos los endpoints exigen un token JWT, excepto el registro, el login y el health check. Ejemplo con `curl` en la sección en inglés.
 
 Los tokens de acceso duran 15 minutos. El login también devuelve un **refresh token** (7 días): `POST /api/auth/refresh` lo cambia por un par nuevo y solo sirve una vez (rotación); reutilizar un refresh token ya usado revoca toda la sesión. `POST /api/auth/logout` cierra la sesión. De los refresh tokens solo se guarda su hash SHA-256. La clave de firma viene de la configuración (`Jwt:SigningKey`, mínimo 32 caracteres) mediante user-secrets o variables de entorno y nunca se sube al repositorio. En Development, si no hay clave, se genera una aleatoria al arrancar (los tokens dejan de valer al reiniciar); en cualquier otro entorno la API no arranca sin una clave válida.
+
+### Organizaciones
+
+Un usuario puede pertenecer a varias organizaciones como `Admin` o `Member` (`/api/organizations`): quien crea una organización es su admin; los admins añaden miembros por e-mail, cambian roles y quitan miembros; cualquier miembro puede salir. El último admin nunca puede ser eliminado ni degradado. Quien no es miembro recibe `404`, así que ni siquiera sabe si la organización existe.
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.
