@@ -51,7 +51,8 @@ internal static class AuthenticationSetup
 
         builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
         builder.Services.AddScoped<IAuthorizationHandler, OrganizationRoleHandler>();
-        builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, OrganizationAuthorizationResultHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, ProjectPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, NotFoundAuthorizationResultHandler>();
 
         return builder;
     }

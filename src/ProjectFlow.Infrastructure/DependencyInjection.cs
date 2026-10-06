@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IOrganizationRepository, OrganizationRepository>();
         services.AddScoped<IOrganizationQueries, OrganizationQueries>();
         services.AddScoped<IOrganizationMembership, OrganizationMembership>();
+        services.AddScoped<IProjectAccessResolver, ProjectAccessResolver>();
 
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<IPasswordHasher, PasswordHasher>();

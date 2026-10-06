@@ -78,6 +78,19 @@ Access tokens last 15 minutes. Login also returns a **refresh token** (7 days): 
 
 A user can belong to several organizations as `Admin` or `Member` (`/api/organizations`): whoever creates an organization becomes its admin; admins add members by e-mail, change roles and remove members; any member can leave. The last admin can never be removed or demoted. Users who are not members get `404` for an organization, so they cannot even tell it exists.
 
+### Roles and permissions
+
+| Action | Org admin | Project manager | Developer | Viewer |
+|---|---|---|---|---|
+| View project and tasks | ✅ | ✅ | ✅ | ✅ |
+| Create and edit projects, manage project members | ✅ | ✅ | | |
+| Manage sprints and epics | ✅ | ✅ | | |
+| Create tasks, comment | ✅ | ✅ | ✅ | |
+| Edit and move tasks | ✅ any | ✅ any | own or assigned | |
+| Reopen done tasks, view activity log | ✅ | ✅ | | |
+
+Roles are checked against the database on every request (never stored in the token). Organization admins have full access to every project of their organization; other members only see projects where they have a role.
+
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
@@ -133,5 +146,9 @@ Los tokens de acceso duran 15 minutos. El login también devuelve un **refresh t
 ### Organizaciones
 
 Un usuario puede pertenecer a varias organizaciones como `Admin` o `Member` (`/api/organizations`): quien crea una organización es su admin; los admins añaden miembros por e-mail, cambian roles y quitan miembros; cualquier miembro puede salir. El último admin nunca puede ser eliminado ni degradado. Quien no es miembro recibe `404`, así que ni siquiera sabe si la organización existe.
+
+### Roles y permisos
+
+La matriz completa está en la sección en inglés. Los roles se comprueban contra la base de datos en cada petición (nunca van en el token). Los admins de la organización tienen acceso total a todos sus proyectos; el resto de miembros solo ve los proyectos donde tiene un rol (Project Manager, Developer o Viewer). Un Developer solo puede editar las tareas que creó o que tiene asignadas.
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.

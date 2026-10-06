@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.Testing;
 using ProjectFlow.Application.Authentication;
 using ProjectFlow.Application.Authentication.Login;
 using ProjectFlow.Application.Authentication.Register;
@@ -21,7 +22,7 @@ public static class ApiUsers
         Converters = { new JsonStringEnumConverter() },
     };
 
-    public static async Task<ApiUser> CreateUserAsync(this ProjectFlowApiFactory api, string name = "user")
+    public static async Task<ApiUser> CreateUserAsync(this WebApplicationFactory<Program> api, string name = "user")
     {
         var email = $"{name}-{TestData.Unique()}@example.com";
         var client = api.CreateClient();
