@@ -373,3 +373,42 @@ internal static class TaskRules
             task.CreatedAt,
             task.UpdatedAt);
 }
+
+// ---------- Status workflow ----------
+
+/// <summary>Moves the task along ToDo → InProgress → Review → Done; Review → InProgress is the only step back (RF-07).</summary>
+public sealed record ChangeTaskStatusCommand(Guid OrganizationId, Guid ProjectId, Guid TaskId, TaskItemStatus Status) : ICommand<Result>;
+
+public sealed class ChangeTaskStatusCommandValidator : AbstractValidator<ChangeTaskStatusCommand>
+{
+    public ChangeTaskStatusCommandValidator()
+    {
+        RuleFor(command => command.Status).IsInEnum();
+    }
+}
+
+public sealed class ChangeTaskStatusCommandHandler(TaskEditor editor, TimeProvider timeProvider)
+    : ICommandHandler<ChangeTaskStatusCommand, Result>
+{
+    public ValueTask<Result> Handle(ChangeTaskStatusCommand command, CancellationToken cancellationToken) =>
+        editor.EditAsync(
+            command.OrganizationId,
+            command.ProjectId,
+            command.TaskId,
+            task => task.ChangeStatus(command.Status, timeProvider.GetUtcNow()),
+            cancellationToken);
+}
+
+/// <summary>Reopens a done task back to InProgress (RF-08). Only project managers and admins, by the endpoint permission.</summary>
+public sealed record ReopenTaskCommand(Guid OrganizationId, Guid ProjectId, Guid TaskId) : ICommand<Result>;
+
+public sealed class ReopenTaskCommandHandler(TaskEditor editor, TimeProvider timeProvider) : ICommandHandler<ReopenTaskCommand, Result>
+{
+    public ValueTask<Result> Handle(ReopenTaskCommand command, CancellationToken cancellationToken) =>
+        editor.EditAsync(
+            command.OrganizationId,
+            command.ProjectId,
+            command.TaskId,
+            task => task.Reopen(timeProvider.GetUtcNow()),
+            cancellationToken);
+}

@@ -104,6 +104,30 @@ public sealed class TasksController(ISender sender) : ApiControllerBase
     public Task<IActionResult> SetEpic(Guid organizationId, Guid projectId, Guid taskId, SetTaskEpicRequest request, CancellationToken cancellationToken) =>
         SendAsync(new SetTaskEpicCommand(organizationId, projectId, taskId, request.EpicId), cancellationToken);
 
+    /// <summary>
+    /// Moves the task through the workflow ToDo → InProgress → Review → Done; Review → InProgress is the only
+    /// step back (RF-07). Other transitions return 422 <c>Task.InvalidTransition</c>.
+    /// </summary>
+    [HttpPost("{taskId:guid}/status")]
+    [RequireProjectPermission(ProjectPermission.EditOwnTasks)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> ChangeStatus(Guid organizationId, Guid projectId, Guid taskId, ChangeTaskStatusRequest request, CancellationToken cancellationToken) =>
+        SendAsync(new ChangeTaskStatusCommand(organizationId, projectId, taskId, request.Status), cancellationToken);
+
+    /// <summary>Reopens a done task back to InProgress (RF-08). Project managers and admins only.</summary>
+    [HttpPost("{taskId:guid}/reopen")]
+    [RequireProjectPermission(ProjectPermission.ReopenTasks)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> Reopen(Guid organizationId, Guid projectId, Guid taskId, CancellationToken cancellationToken) =>
+        SendAsync(new ReopenTaskCommand(organizationId, projectId, taskId), cancellationToken);
+
     /// <summary>Soft-deletes the task. Project managers and admins only.</summary>
     [HttpDelete("{taskId:guid}")]
     [RequireProjectPermission(ProjectPermission.EditAnyTask)]
@@ -138,3 +162,5 @@ public sealed record AssignTaskRequest(Guid? AssigneeId);
 public sealed record MoveTaskToSprintRequest(Guid? SprintId);
 
 public sealed record SetTaskEpicRequest(Guid? EpicId);
+
+public sealed record ChangeTaskStatusRequest(TaskItemStatus Status);

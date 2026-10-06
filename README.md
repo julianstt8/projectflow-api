@@ -90,6 +90,8 @@ Sprints belong to a project (`.../projects/{projectId}/sprints`) and go **Planne
 
 **Tasks** (`.../projects/{projectId}/tasks`) get sequential keys per project (`WEB-12`), safe under concurrent creation: the project row is locked while numbering. They have a type, priority, story points (0–100), an assignee (someone who works in the project), a sprint (or the backlog) and an epic. Developers can change only tasks they reported or are assigned to; only project managers delete tasks (soft delete). Done tasks are read-only.
 
+Task status follows **ToDo → InProgress → Review → Done**, with Review → InProgress as the only step back (`POST .../tasks/{taskId}/status`, RF-07). Only project managers and organization admins reopen a done task (`POST .../tasks/{taskId}/reopen`, back to InProgress, RF-08).
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -186,6 +188,8 @@ Los sprints pertenecen a un proyecto (`.../projects/{projectId}/sprints`) y pasa
 Las **épicas** (`.../projects/{projectId}/epics`) agrupan tareas y muestran su progreso (tareas y tareas terminadas). Una épica cerrada no acepta tareas nuevas hasta que se reabre.
 
 Las **tareas** (`.../projects/{projectId}/tasks`) reciben claves consecutivas por proyecto (`WEB-12`), seguras ante creaciones simultáneas: la fila del proyecto se bloquea mientras se numera. Tienen tipo, prioridad, puntos (0–100), responsable (alguien que trabaja en el proyecto), sprint (o backlog) y épica. Un Developer solo puede cambiar las tareas que creó o tiene asignadas; solo los project managers las eliminan (soft delete). Las tareas terminadas son de solo lectura.
+
+El estado sigue **ToDo → InProgress → Review → Done**, con Review → InProgress como único retroceso (`POST .../tasks/{taskId}/status`, RF-07). Solo los project managers y admins de la organización reabren una tarea terminada (`POST .../tasks/{taskId}/reopen`, vuelve a InProgress, RF-08).
 
 ### Roles y permisos
 
