@@ -1,6 +1,7 @@
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using ProjectFlow.Api.Authorization;
+using ProjectFlow.Application.Common;
 using ProjectFlow.Application.Tasks;
 using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Projects;
@@ -15,12 +16,32 @@ namespace ProjectFlow.Api.Controllers;
 [Route("api/organizations/{organizationId:guid}/projects/{projectId:guid}/tasks")]
 public sealed class TasksController(ISender sender) : ApiControllerBase
 {
-    /// <summary>Tasks of the project by number.</summary>
+    /// <summary>
+    /// Searches the project's tasks (RF-11). Filters are optional and combined: <c>status</c> (repeatable),
+    /// <c>assigneeId</c> or <c>unassigned=true</c>, <c>sprintId</c> or <c>backlog=true</c>, <c>epicId</c>, <c>labelId</c>
+    /// and <c>q</c> (title words ignoring case and accents, or a key such as <c>WEB-12</c>). Sorted by
+    /// <c>sort</c> (<c>number</c>, <c>-number</c>, <c>updatedAt</c>, <c>-updatedAt</c>) and paged.
+    /// </summary>
     [HttpGet]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
-    [ProducesResponseType<IReadOnlyList<TaskResponse>>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> List(Guid organizationId, Guid projectId, CancellationToken cancellationToken) =>
-        Ok(await sender.Send(new GetTasksQuery(projectId), cancellationToken));
+    [ProducesResponseType<PagedResponse<TaskResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Search(Guid organizationId, Guid projectId, [FromQuery] TaskSearchRequest request, CancellationToken cancellationToken) =>
+        Ok(await sender.Send(
+            new SearchTasksQuery(new TaskSearchCriteria(
+                projectId,
+                request.Status ?? [],
+                request.AssigneeId,
+                request.Unassigned,
+                request.SprintId,
+                request.Backlog,
+                request.EpicId,
+                request.LabelId,
+                request.Q,
+                request.Sort ?? TaskSort.Number,
+                request.Page,
+                request.PageSize)),
+            cancellationToken));
 
     [HttpGet("{taskId:guid}")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
@@ -164,3 +185,29 @@ public sealed record MoveTaskToSprintRequest(Guid? SprintId);
 public sealed record SetTaskEpicRequest(Guid? EpicId);
 
 public sealed record ChangeTaskStatusRequest(TaskItemStatus Status);
+
+/// <summary>Query string of the task search (RF-11).</summary>
+public sealed class TaskSearchRequest
+{
+    public TaskItemStatus[]? Status { get; init; }
+
+    public Guid? AssigneeId { get; init; }
+
+    public bool Unassigned { get; init; }
+
+    public Guid? SprintId { get; init; }
+
+    public bool Backlog { get; init; }
+
+    public Guid? EpicId { get; init; }
+
+    public Guid? LabelId { get; init; }
+
+    public string? Q { get; init; }
+
+    public string? Sort { get; init; }
+
+    public int Page { get; init; } = 1;
+
+    public int PageSize { get; init; } = 25;
+}

@@ -51,6 +51,9 @@ public sealed class ApplicationDbContext(
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
+        // Accent-insensitive text search (RF-11): "validacion" finds "Validación".
+        modelBuilder.HasPostgresExtension("unaccent");
+
         // Join tables (project_members, task_labels) are reached only through their filtered parent.
         ApplyOrganizationFilter<Project>(modelBuilder);
         ApplyOrganizationFilter<Sprint>(modelBuilder);

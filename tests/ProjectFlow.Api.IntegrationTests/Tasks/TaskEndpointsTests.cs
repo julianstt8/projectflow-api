@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using ProjectFlow.Api.Controllers;
 using ProjectFlow.Api.IntegrationTests.Infrastructure;
+using ProjectFlow.Application.Common;
 using ProjectFlow.Application.Epics;
 using ProjectFlow.Application.Sprints;
 using ProjectFlow.Application.Tasks;
@@ -212,7 +213,7 @@ public class TaskEndpointsTests(ProjectFlowApiFactory api)
         Assert.Equal(HttpStatusCode.NoContent, byManager.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await world.Org.Admin.Client.GetAsync($"{world.Tasks}/{task.Id}")).StatusCode);
         Assert.DoesNotContain(
-            await (await world.Org.Admin.Client.GetAsync(world.Tasks)).ReadAsync<List<TaskResponse>>(),
+            (await (await world.Org.Admin.Client.GetAsync(world.Tasks)).ReadAsync<PagedResponse<TaskResponse>>()).Items,
             listed => listed.Id == task.Id);
     }
 
