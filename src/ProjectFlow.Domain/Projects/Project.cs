@@ -1,3 +1,4 @@
+using ProjectFlow.Domain.Activity;
 using ProjectFlow.Domain.Common;
 
 namespace ProjectFlow.Domain.Projects;
@@ -69,6 +70,7 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
         var (validName, validDescription) = details.Value;
         var project = new Project(Guid.CreateVersion7(now), organizationId, key, validName, validDescription, now);
         project._members.Add(new ProjectMember(project.Id, creatorUserId, ProjectRole.ProjectManager));
+        project.RaiseLifecycle("Created");
 
         return project;
     }
@@ -104,6 +106,7 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         IsArchived = true;
+        RaiseLifecycle("Archived");
         return Result.Success();
     }
 
@@ -120,6 +123,7 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         IsArchived = false;
+        RaiseLifecycle("Unarchived");
         return Result.Success();
     }
 
@@ -132,6 +136,7 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         DeletedAt = now;
+        RaiseLifecycle("Deleted");
         return Result.Success();
     }
 
@@ -159,6 +164,7 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         _members.Add(new ProjectMember(Id, userId, role));
+        Raise(new ProjectMemberChanged(OrganizationId, Id, userId, FromRole: null, role.ToString()));
         return Result.Success();
     }
 
@@ -186,6 +192,11 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
             return ProjectErrors.LastProjectManager;
         }
 
+        if (member.Role != role)
+        {
+            Raise(new ProjectMemberChanged(OrganizationId, Id, userId, member.Role.ToString(), role.ToString()));
+        }
+
         member.ChangeRole(role);
         return Result.Success();
     }
@@ -210,6 +221,7 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         _members.Remove(member);
+        Raise(new ProjectMemberChanged(OrganizationId, Id, userId, member.Role.ToString(), ToRole: null));
         return Result.Success();
     }
 
@@ -230,6 +242,9 @@ public sealed class Project : Entity, IOrganizationOwned, ISoftDeletable
     }
 
     internal int AllocateTaskNumber() => NextTaskNumber++;
+
+    private void RaiseLifecycle(string step) =>
+        Raise(new LifecycleChanged(OrganizationId, Id, ActivityEntityTypes.Project, Id, step, Name));
 
     private ProjectMember? FindMember(Guid userId) => _members.Find(member => member.UserId == userId);
 

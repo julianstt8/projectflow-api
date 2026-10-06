@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<ICommentQueries, CommentQueries>();
         services.AddScoped<ILabelRepository, LabelRepository>();
         services.AddScoped<ILabelQueries, LabelQueries>();
+        services.AddScoped<IActivityQueries, ActivityQueries>();
         services.AddScoped<IEpicRepository, EpicRepository>();
         services.AddScoped<IEpicQueries, EpicQueries>();
         services.AddScoped<IOrganizationMembership, OrganizationMembership>();

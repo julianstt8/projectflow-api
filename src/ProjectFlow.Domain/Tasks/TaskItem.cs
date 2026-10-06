@@ -1,3 +1,4 @@
+using ProjectFlow.Domain.Activity;
 using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Epics;
 using ProjectFlow.Domain.Labels;
@@ -117,7 +118,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
         var (validTitle, validDescription) = details.Value;
         var number = project.AllocateTaskNumber();
 
-        return new TaskItem(
+        var task = new TaskItem(
             Guid.CreateVersion7(now),
             project.Id,
             project.OrganizationId,
@@ -128,6 +129,8 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             validDescription,
             priority,
             now);
+        task.Raise(new TaskCreated(task.OrganizationId, task.ProjectId, task.Id, task.Title));
+        return task;
     }
 
     public Result UpdateDetails(TaskType type, string title, string? description, TaskPriority priority, DateTimeOffset now)
@@ -144,7 +147,18 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             return details.Error;
         }
 
-        (Title, Description) = details.Value;
+        var (newTitle, newDescription) = details.Value;
+        if (newTitle != Title)
+        {
+            Raise(new TaskTitleChanged(OrganizationId, ProjectId, Id, Title, newTitle));
+        }
+
+        if (priority != Priority)
+        {
+            Raise(new TaskPriorityChanged(OrganizationId, ProjectId, Id, Priority.ToString(), priority.ToString()));
+        }
+
+        (Title, Description) = (newTitle, newDescription);
         Type = type;
         Priority = priority;
         return Touch(now);
@@ -161,6 +175,11 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
         if (storyPoints is < 0 or > MaxStoryPoints)
         {
             return TaskErrors.StoryPointsOutOfRange;
+        }
+
+        if (storyPoints != StoryPoints)
+        {
+            Raise(new TaskStoryPointsChanged(OrganizationId, ProjectId, Id, StoryPoints, storyPoints));
         }
 
         StoryPoints = storyPoints;
@@ -181,6 +200,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             return TaskErrors.UserRequired;
         }
 
+        RaiseReferenceChange(TaskReferenceChanged.Assignee, AssigneeId, assigneeId);
         AssigneeId = assigneeId;
         return Touch(now);
     }
@@ -207,6 +227,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             }
         }
 
+        RaiseReferenceChange(TaskReferenceChanged.Sprint, SprintId, sprint?.Id);
         SprintId = sprint?.Id;
         return Touch(now);
     }
@@ -233,6 +254,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             }
         }
 
+        RaiseReferenceChange(TaskReferenceChanged.Epic, EpicId, epic?.Id);
         EpicId = epic?.Id;
         return Touch(now);
     }
@@ -256,6 +278,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         _labels.Add(new TaskLabel(Id, label.Id));
+        Raise(new TaskLabelChanged(OrganizationId, ProjectId, Id, label.Id, Added: true));
         return Touch(now);
     }
 
@@ -272,6 +295,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             return Result.Success();
         }
 
+        Raise(new TaskLabelChanged(OrganizationId, ProjectId, Id, labelId, Added: false));
         return Touch(now);
     }
 
@@ -293,6 +317,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
             return TaskErrors.InvalidTransition(Status, status);
         }
 
+        Raise(new TaskStatusChanged(OrganizationId, ProjectId, Id, Status.ToString(), status.ToString()));
         Status = status;
         return Touch(now);
     }
@@ -314,6 +339,7 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         Status = TaskItemStatus.InProgress;
+        Raise(new TaskReopened(OrganizationId, ProjectId, Id));
         return Touch(now);
     }
 
@@ -326,7 +352,16 @@ public sealed class TaskItem : Entity, IOrganizationOwned, ISoftDeletable
         }
 
         DeletedAt = now;
+        Raise(new TaskDeleted(OrganizationId, ProjectId, Id));
         return Touch(now);
+    }
+
+    private void RaiseReferenceChange(string reference, Guid? from, Guid? to)
+    {
+        if (from != to)
+        {
+            Raise(new TaskReferenceChanged(OrganizationId, ProjectId, Id, reference, from, to));
+        }
     }
 
     /// <summary>A deleted or done task cannot be edited (RF-08).</summary>

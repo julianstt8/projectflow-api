@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectFlow.Application.Abstractions;
+using ProjectFlow.Domain.Activity;
 using ProjectFlow.Domain.Comments;
 using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Epics;
@@ -41,6 +42,8 @@ public sealed class ApplicationDbContext(
 
     public DbSet<Comment> Comments => Set<Comment>();
 
+    public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
+
     // Read by the query filters on every query; EF Core parameterizes it per DbContext instance.
     private Guid? CurrentOrganizationId => currentOrganization.OrganizationId;
 
@@ -55,6 +58,7 @@ public sealed class ApplicationDbContext(
         ApplyOrganizationFilter<TaskItem>(modelBuilder);
         ApplyOrganizationFilter<Label>(modelBuilder);
         ApplyOrganizationFilter<Comment>(modelBuilder);
+        ApplyOrganizationFilter<ActivityLog>(modelBuilder);
 
         ApplySoftDeleteFilter<Project>(modelBuilder);
         ApplySoftDeleteFilter<TaskItem>(modelBuilder);

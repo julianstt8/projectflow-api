@@ -1,3 +1,4 @@
+using ProjectFlow.Domain.Activity;
 using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Tasks;
 
@@ -46,7 +47,9 @@ public sealed class Comment : Entity, IOrganizationOwned
             return validBody.Error;
         }
 
-        return new Comment(Guid.CreateVersion7(now), task.Id, task.OrganizationId, authorId, validBody.Value, now);
+        var comment = new Comment(Guid.CreateVersion7(now), task.Id, task.OrganizationId, authorId, validBody.Value, now);
+        comment.Raise(new CommentAdded(task.OrganizationId, task.ProjectId, task.Id, comment.Id));
+        return comment;
     }
 
     public Result Edit(Guid editorId, string body)
