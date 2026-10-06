@@ -78,6 +78,10 @@ Access tokens last 15 minutes. Login also returns a **refresh token** (7 days): 
 
 A user can belong to several organizations as `Admin` or `Member` (`/api/organizations`): whoever creates an organization becomes its admin; admins add members by e-mail, change roles and remove members; any member can leave. The last admin can never be removed or demoted. Users who are not members get `404` for an organization, so they cannot even tell it exists.
 
+### Projects
+
+Projects live inside an organization (`/api/organizations/{organizationId}/projects`). Organization admins create them (and become their project manager) and can soft-delete them; project managers edit, archive (read-only) and manage project members, who must belong to the organization. Project keys like `WEB` are unique within the organization and stay reserved after deletion.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -162,6 +166,10 @@ Los tokens de acceso duran 15 minutos. El login también devuelve un **refresh t
 ### Organizaciones
 
 Un usuario puede pertenecer a varias organizaciones como `Admin` o `Member` (`/api/organizations`): quien crea una organización es su admin; los admins añaden miembros por e-mail, cambian roles y quitan miembros; cualquier miembro puede salir. El último admin nunca puede ser eliminado ni degradado. Quien no es miembro recibe `404`, así que ni siquiera sabe si la organización existe.
+
+### Proyectos
+
+Los proyectos viven dentro de una organización (`/api/organizations/{organizationId}/projects`). Los admins de la organización los crean (y quedan como project manager) y pueden eliminarlos (soft delete); los project managers los editan, los archivan (solo lectura) y gestionan sus miembros, que deben pertenecer a la organización. Las claves como `WEB` son únicas dentro de la organización y quedan reservadas tras eliminar el proyecto.
 
 ### Roles y permisos
 

@@ -31,6 +31,8 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IOrganizationRepository, OrganizationRepository>();
         services.AddScoped<IOrganizationQueries, OrganizationQueries>();
+        services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<IProjectQueries, ProjectQueries>();
         services.AddScoped<IOrganizationMembership, OrganizationMembership>();
         services.AddScoped<IProjectAccessResolver, ProjectAccessResolver>();
 
