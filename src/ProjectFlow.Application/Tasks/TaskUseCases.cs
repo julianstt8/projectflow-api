@@ -13,14 +13,6 @@ namespace ProjectFlow.Application.Tasks;
 
 // ---------- Queries ----------
 
-public sealed record GetTasksQuery(Guid ProjectId) : IQuery<IReadOnlyList<TaskResponse>>;
-
-public sealed class GetTasksQueryHandler(ITaskQueries queries) : IQueryHandler<GetTasksQuery, IReadOnlyList<TaskResponse>>
-{
-    public async ValueTask<IReadOnlyList<TaskResponse>> Handle(GetTasksQuery query, CancellationToken cancellationToken) =>
-        await queries.ListByProjectAsync(query.ProjectId, cancellationToken);
-}
-
 public sealed record GetTaskQuery(Guid ProjectId, Guid TaskId) : IQuery<Result<TaskResponse>>;
 
 public sealed class GetTaskQueryHandler(ITaskQueries queries) : IQueryHandler<GetTaskQuery, Result<TaskResponse>>
