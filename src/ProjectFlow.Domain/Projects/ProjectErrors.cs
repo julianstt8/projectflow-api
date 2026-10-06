@@ -31,13 +31,13 @@ public static class ProjectErrors
         Error.Validation("Project.RoleInvalid", "The project role is not valid.");
 
     public static readonly Error Archived =
-        Error.Conflict("Project.Archived", "The project is archived and cannot be changed.");
+        Error.BusinessRule("Project.Archived", "The project is archived and cannot be changed.");
 
     public static readonly Error NotArchived =
-        Error.Conflict("Project.NotArchived", "The project is not archived.");
+        Error.BusinessRule("Project.NotArchived", "The project is not archived.");
 
     public static readonly Error Deleted =
-        Error.Conflict("Project.Deleted", "The project has been deleted.");
+        Error.BusinessRule("Project.Deleted", "The project has been deleted.");
 
     public static readonly Error MemberAlreadyExists =
         Error.Conflict("Project.MemberAlreadyExists", "The user is already a member of the project.");
@@ -46,5 +46,5 @@ public static class ProjectErrors
         Error.NotFound("Project.MemberNotFound", "The user is not a member of the project.");
 
     public static readonly Error LastProjectManager =
-        Error.Conflict("Project.LastProjectManager", "A project must keep at least one project manager.");
+        Error.BusinessRule("Project.LastProjectManager", "A project must keep at least one project manager.");
 }

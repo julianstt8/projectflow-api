@@ -31,5 +31,5 @@ public static class OrganizationErrors
         Error.NotFound("Organization.MemberNotFound", "The user is not a member of the organization.");
 
     public static readonly Error LastAdmin =
-        Error.Conflict("Organization.LastAdmin", "The last admin of an organization cannot be removed or demoted.");
+        Error.BusinessRule("Organization.LastAdmin", "The last admin of an organization cannot be removed or demoted.");
 }

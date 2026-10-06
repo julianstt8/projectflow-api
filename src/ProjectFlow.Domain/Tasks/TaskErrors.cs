@@ -29,29 +29,29 @@ public static class TaskErrors
         Error.Validation("Task.UserRequired", "A valid user id is required.");
 
     public static readonly Error Closed =
-        Error.Conflict("Task.Closed", "A done task cannot be changed until it is reopened.");
+        Error.BusinessRule("Task.Closed", "A done task cannot be changed until it is reopened.");
 
     public static readonly Error NotDone =
-        Error.Conflict("Task.NotDone", "Only a done task can be reopened.");
+        Error.BusinessRule("Task.NotDone", "Only a done task can be reopened.");
 
     public static readonly Error Deleted =
-        Error.Conflict("Task.Deleted", "The task has been deleted.");
+        Error.BusinessRule("Task.Deleted", "The task has been deleted.");
 
     public static readonly Error SprintFromAnotherProject =
         Error.Validation("Task.SprintFromAnotherProject", "The sprint belongs to another project.");
 
     public static readonly Error SprintCompleted =
-        Error.Conflict("Task.SprintCompleted", "Tasks cannot be moved into a completed sprint.");
+        Error.BusinessRule("Task.SprintCompleted", "Tasks cannot be moved into a completed sprint.");
 
     public static readonly Error EpicFromAnotherProject =
         Error.Validation("Task.EpicFromAnotherProject", "The epic belongs to another project.");
 
     public static readonly Error EpicClosed =
-        Error.Conflict("Task.EpicClosed", "Tasks cannot be added to a closed epic.");
+        Error.BusinessRule("Task.EpicClosed", "Tasks cannot be added to a closed epic.");
 
     public static readonly Error LabelFromAnotherProject =
         Error.Validation("Task.LabelFromAnotherProject", "The label belongs to another project.");
 
     public static Error InvalidTransition(TaskItemStatus from, TaskItemStatus to) =>
-        Error.Conflict("Task.InvalidTransition", $"A task cannot move from {from} to {to}.");
+        Error.BusinessRule("Task.InvalidTransition", $"A task cannot move from {from} to {to}.");
 }

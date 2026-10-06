@@ -91,6 +91,22 @@ A user can belong to several organizations as `Admin` or `Member` (`/api/organiz
 
 Roles are checked against the database on every request (never stored in the token). Organization admins have full access to every project of their organization; other members only see projects where they have a role.
 
+### Errors
+
+Every error is returned as [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) ProblemDetails (`application/problem+json`) with a stable `code` and a `traceId`:
+
+```json
+{ "status": 422, "title": "The last admin of an organization cannot be removed or demoted.", "code": "Organization.LastAdmin", "traceId": "00-…" }
+```
+
+| Status | Meaning |
+|---|---|
+| 400 | Invalid request; `errors` lists the problems per field |
+| 401 / 403 | Not authenticated / not allowed |
+| 404 | Not found, or not visible to the current user |
+| 409 | Conflicts with existing data (duplicate value, concurrent change) |
+| 422 | Valid request that breaks a business rule |
+
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
 ---
@@ -150,5 +166,9 @@ Un usuario puede pertenecer a varias organizaciones como `Admin` o `Member` (`/a
 ### Roles y permisos
 
 La matriz completa está en la sección en inglés. Los roles se comprueban contra la base de datos en cada petición (nunca van en el token). Los admins de la organización tienen acceso total a todos sus proyectos; el resto de miembros solo ve los proyectos donde tiene un rol (Project Manager, Developer o Viewer). Un Developer solo puede editar las tareas que creó o que tiene asignadas.
+
+### Errores
+
+Todos los errores se devuelven como ProblemDetails (RFC 9457, `application/problem+json`) con un `code` estable y un `traceId`: 400 petición inválida (con `errors` por campo), 401/403 sin autenticar / sin permiso, 404 no existe o no es visible para el usuario, 409 choca con datos existentes (valor duplicado, cambio concurrente), 422 petición válida que rompe una regla de negocio.
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.
