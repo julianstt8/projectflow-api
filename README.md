@@ -88,6 +88,8 @@ Sprints belong to a project (`.../projects/{projectId}/sprints`) and go **Planne
 
 **Epics** (`.../projects/{projectId}/epics`) group tasks and show their progress (tasks and done tasks). A closed epic accepts no new tasks until it is reopened.
 
+**Tasks** (`.../projects/{projectId}/tasks`) get sequential keys per project (`WEB-12`), safe under concurrent creation: the project row is locked while numbering. They have a type, priority, story points (0–100), an assignee (someone who works in the project), a sprint (or the backlog) and an epic. Developers can change only tasks they reported or are assigned to; only project managers delete tasks (soft delete). Done tasks are read-only.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -182,6 +184,8 @@ Los proyectos viven dentro de una organización (`/api/organizations/{organizati
 Los sprints pertenecen a un proyecto (`.../projects/{projectId}/sprints`) y pasan por **Planned → Active → Completed**. Un proyecto tiene **como máximo un sprint activo** (RF-05), garantizado por el dominio y por un índice único parcial, así que dos inicios simultáneos nunca pueden tener éxito a la vez. Al completar un sprint, sus tareas sin terminar vuelven al backlog; las terminadas se quedan en el sprint.
 
 Las **épicas** (`.../projects/{projectId}/epics`) agrupan tareas y muestran su progreso (tareas y tareas terminadas). Una épica cerrada no acepta tareas nuevas hasta que se reabre.
+
+Las **tareas** (`.../projects/{projectId}/tasks`) reciben claves consecutivas por proyecto (`WEB-12`), seguras ante creaciones simultáneas: la fila del proyecto se bloquea mientras se numera. Tienen tipo, prioridad, puntos (0–100), responsable (alguien que trabaja en el proyecto), sprint (o backlog) y épica. Un Developer solo puede cambiar las tareas que creó o tiene asignadas; solo los project managers las eliminan (soft delete). Las tareas terminadas son de solo lectura.
 
 ### Roles y permisos
 

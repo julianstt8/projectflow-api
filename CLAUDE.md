@@ -70,6 +70,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Changing the permission matrix means updating `ProjectPermissionsTests` (domain) and `ProjectAuthorizationTests` (API) on purpose: both spell the PRD matrix out by hand.
 - Enums are serialized as strings in JSON.
 - Refresh tokens: one family per login, rotated on every use, family revoked on reuse; stored only as SHA-256. The refresh use case handles `ConcurrencyConflictException` itself (a lost race counts as reuse).
+- Task numbering (RF-04) locks the project row (`IProjectRepository.LockForTaskNumberingAsync` inside `IUnitOfWork.BeginTransactionAsync`) so concurrent creations wait instead of colliding. Task changes go through `TaskEditor`, which applies the developer "own or assigned" rule; use it for every new task-changing use case.
 - Handlers use ports from `Application/Abstractions` (`IUserRepository`, `IUnitOfWork`, `IPasswordHasher`, `IAccessTokenGenerator`, `TimeProvider`); never `ApplicationDbContext` directly.
 
 ## Tests

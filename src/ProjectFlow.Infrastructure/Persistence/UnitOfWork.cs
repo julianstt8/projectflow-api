@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
 using ProjectFlow.Application.Abstractions.Persistence;
 
@@ -21,5 +22,15 @@ internal sealed class UnitOfWork(ApplicationDbContext dbContext) : IUnitOfWork
         {
             throw new UniqueConstraintViolationException(postgres.ConstraintName, exception);
         }
+    }
+
+    public async Task<ITransaction> BeginTransactionAsync(CancellationToken cancellationToken) =>
+        new EfTransaction(await dbContext.Database.BeginTransactionAsync(cancellationToken));
+
+    private sealed class EfTransaction(IDbContextTransaction transaction) : ITransaction
+    {
+        public Task CommitAsync(CancellationToken cancellationToken) => transaction.CommitAsync(cancellationToken);
+
+        public ValueTask DisposeAsync() => transaction.DisposeAsync();
     }
 }
