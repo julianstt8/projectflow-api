@@ -49,7 +49,7 @@ dotnet tool restore           # installs the local dotnet-ef tool
 dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --startup-project src/ProjectFlow.Api --output-dir Persistence/Migrations
 ```
 
-- Tables and columns are snake_case (`EFCore.NamingConventions`); enums are stored as text.
+- Tables and columns are snake_case (`EFCore.NamingConventions`); enums are stored as text, so `ORDER BY` an enum in SQL is alphabetical: order by enum value in memory after the query.
 - Entities are materialized through their constructors: constructor parameter names must match property names.
 - Every model change needs a migration; `ProjectFlow.Infrastructure.Tests` fails if one is missing.
 - Migrations run on startup only in Development with `Database:MigrateOnStartup=true` (set by docker-compose).
