@@ -86,6 +86,8 @@ Projects live inside an organization (`/api/organizations/{organizationId}/proje
 
 Sprints belong to a project (`.../projects/{projectId}/sprints`) and go **Planned → Active → Completed**. A project has **at most one active sprint** (RF-05), enforced by the domain and by a partial unique index, so two simultaneous starts can never both succeed. Completing a sprint moves its unfinished tasks back to the backlog; done tasks stay in the sprint.
 
+**Epics** (`.../projects/{projectId}/epics`) group tasks and show their progress (tasks and done tasks). A closed epic accepts no new tasks until it is reopened.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -178,6 +180,8 @@ Los proyectos viven dentro de una organización (`/api/organizations/{organizati
 ### Sprints
 
 Los sprints pertenecen a un proyecto (`.../projects/{projectId}/sprints`) y pasan por **Planned → Active → Completed**. Un proyecto tiene **como máximo un sprint activo** (RF-05), garantizado por el dominio y por un índice único parcial, así que dos inicios simultáneos nunca pueden tener éxito a la vez. Al completar un sprint, sus tareas sin terminar vuelven al backlog; las terminadas se quedan en el sprint.
+
+Las **épicas** (`.../projects/{projectId}/epics`) agrupan tareas y muestran su progreso (tareas y tareas terminadas). Una épica cerrada no acepta tareas nuevas hasta que se reabre.
 
 ### Roles y permisos
 
