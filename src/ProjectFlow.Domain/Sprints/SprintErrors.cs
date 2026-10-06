@@ -17,13 +17,13 @@ public static class SprintErrors
         Error.Validation("Sprint.EndBeforeStart", "The end date cannot be earlier than the start date.");
 
     public static readonly Error NotPlanned =
-        Error.Conflict("Sprint.NotPlanned", "Only a planned sprint can be started.");
+        Error.BusinessRule("Sprint.NotPlanned", "Only a planned sprint can be started.");
 
     public static readonly Error NotActive =
-        Error.Conflict("Sprint.NotActive", "Only an active sprint can be completed.");
+        Error.BusinessRule("Sprint.NotActive", "Only an active sprint can be completed.");
 
     public static readonly Error Completed =
-        Error.Conflict("Sprint.Completed", "A completed sprint cannot be changed.");
+        Error.BusinessRule("Sprint.Completed", "A completed sprint cannot be changed.");
 
     public static readonly Error AnotherSprintActive =
         Error.Conflict("Sprint.AnotherSprintActive", "The project already has an active sprint.");

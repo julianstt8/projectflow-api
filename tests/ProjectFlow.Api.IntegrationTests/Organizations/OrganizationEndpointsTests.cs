@@ -175,9 +175,9 @@ public class OrganizationEndpointsTests(ProjectFlowApiFactory api)
             new ChangeMemberRoleRequest(OrganizationRole.Member));
         var leave = await ana.Client.DeleteAsync($"/api/organizations/{organization.Id}/members/{ana.Id}");
 
-        Assert.Equal(HttpStatusCode.Conflict, demote.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, demote.StatusCode);
         Assert.Equal("Organization.LastAdmin", await demote.ReadErrorCodeAsync());
-        Assert.Equal(HttpStatusCode.Conflict, leave.StatusCode);
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, leave.StatusCode);
         Assert.Equal("Organization.LastAdmin", await leave.ReadErrorCodeAsync());
     }
 

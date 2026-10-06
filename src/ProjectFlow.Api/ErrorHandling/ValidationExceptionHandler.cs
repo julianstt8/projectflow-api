@@ -27,6 +27,7 @@ internal sealed class ValidationExceptionHandler(IProblemDetailsService problemD
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "One or more validation errors occurred.",
+                Extensions = { ["code"] = "Validation.Failed" },
             },
         });
     }

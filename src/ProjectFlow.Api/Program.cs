@@ -30,9 +30,7 @@ builder.AddJwtAuthentication();
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
-builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<ConcurrencyConflictExceptionHandler>();
+builder.Services.AddProjectFlowProblemDetails();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();

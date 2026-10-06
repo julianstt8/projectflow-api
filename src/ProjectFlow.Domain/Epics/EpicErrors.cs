@@ -14,8 +14,8 @@ public static class EpicErrors
         Error.Validation("Epic.DescriptionTooLong", $"The epic description cannot exceed {Epic.DescriptionMaxLength} characters.");
 
     public static readonly Error AlreadyClosed =
-        Error.Conflict("Epic.AlreadyClosed", "The epic is already closed.");
+        Error.BusinessRule("Epic.AlreadyClosed", "The epic is already closed.");
 
     public static readonly Error AlreadyOpen =
-        Error.Conflict("Epic.AlreadyOpen", "The epic is already open.");
+        Error.BusinessRule("Epic.AlreadyOpen", "The epic is already open.");
 }

@@ -60,13 +60,13 @@ public sealed class OrganizationsController(ISender sender) : ApiControllerBase
             : ErrorResult(result.Error);
     }
 
-    /// <summary>Changes a member's role. Admins only; the last admin cannot be demoted.</summary>
+    /// <summary>Changes a member's role. Admins only; the last admin cannot be demoted (422).</summary>
     [HttpPut("{organizationId:guid}/members/{userId:guid}")]
     [Authorize(Policy = OrganizationPolicies.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> ChangeMemberRole(
         Guid organizationId,
         Guid userId,
@@ -84,7 +84,7 @@ public sealed class OrganizationsController(ISender sender) : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> RemoveMember(Guid organizationId, Guid userId, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new RemoveOrganizationMemberCommand(organizationId, userId), cancellationToken);
