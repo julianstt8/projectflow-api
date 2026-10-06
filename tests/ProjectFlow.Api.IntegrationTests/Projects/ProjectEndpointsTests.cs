@@ -1,9 +1,7 @@
 using System.Net;
 using ProjectFlow.Api.Controllers;
 using ProjectFlow.Api.IntegrationTests.Infrastructure;
-using ProjectFlow.Application.Organizations;
 using ProjectFlow.Application.Projects;
-using ProjectFlow.Domain.Organizations;
 using ProjectFlow.Domain.Projects;
 
 namespace ProjectFlow.Api.IntegrationTests.Projects;
@@ -16,7 +14,7 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Admin_creates_a_project_and_becomes_its_project_manager()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
 
         var response = await org.Admin.Client.PostJsonAsync(org.Projects, new CreateProjectRequest(" web ", "ProjectFlow Web", "Customer app"));
 
@@ -36,9 +34,9 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Project_keys_are_unique_per_organization_and_stay_reserved_after_delete()
     {
-        var org = await OrganizationAsync();
-        var other = await OrganizationAsync();
-        var project = await CreateProjectAsync(org, "API");
+        var org = await api.CreateOrganizationAsync();
+        var other = await api.CreateOrganizationAsync();
+        var project = await org.CreateProjectAsync("API");
 
         var duplicate = await org.Admin.Client.PostJsonAsync(org.Projects, new CreateProjectRequest("api", "Again", null));
         var otherOrganization = await other.Admin.Client.PostJsonAsync(other.Projects, new CreateProjectRequest("API", "Theirs", null));
@@ -54,7 +52,7 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Invalid_key_returns_400()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
 
         var response = await org.Admin.Client.PostJsonAsync(org.Projects, new CreateProjectRequest("1BAD-KEY", "Bad", null));
 
@@ -65,7 +63,7 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Only_organization_admins_create_projects()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var member = await org.AddMemberAsync("member");
 
         var response = await member.Client.PostJsonAsync(org.Projects, new CreateProjectRequest("NOPE", "Nope", null));
@@ -78,11 +76,11 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Admins_list_every_project_and_members_only_their_own()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var carla = await org.AddMemberAsync("carla");
-        var visible = await CreateProjectAsync(org, "VIS");
-        var hidden = await CreateProjectAsync(org, "HID");
-        await AddProjectMemberAsync(org, visible.Id, carla, ProjectRole.Developer);
+        var visible = await org.CreateProjectAsync("VIS");
+        var hidden = await org.CreateProjectAsync("HID");
+        await org.AddProjectMemberAsync(visible.Id, carla, ProjectRole.Developer);
 
         var adminList = await (await org.Admin.Client.GetAsync(org.Projects)).ReadAsync<List<ProjectSummaryResponse>>();
         var carlaList = await (await carla.Client.GetAsync(org.Projects)).ReadAsync<List<ProjectSummaryResponse>>();
@@ -97,9 +95,9 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Users_of_another_organization_cannot_see_the_projects()
     {
-        var org = await OrganizationAsync();
-        var outsider = await OrganizationAsync();
-        var project = await CreateProjectAsync(org, "SEC");
+        var org = await api.CreateOrganizationAsync();
+        var outsider = await api.CreateOrganizationAsync();
+        var project = await org.CreateProjectAsync("SEC");
 
         Assert.Equal(HttpStatusCode.NotFound, (await outsider.Admin.Client.GetAsync(org.Projects)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await outsider.Admin.Client.GetAsync($"{org.Projects}/{project.Id}")).StatusCode);
@@ -111,12 +109,12 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Project_manager_edits_the_project_but_a_developer_cannot()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var bruno = await org.AddMemberAsync("bruno");
         var carla = await org.AddMemberAsync("carla");
-        var project = await CreateProjectAsync(org, "EDT");
-        await AddProjectMemberAsync(org, project.Id, bruno, ProjectRole.ProjectManager);
-        await AddProjectMemberAsync(org, project.Id, carla, ProjectRole.Developer);
+        var project = await org.CreateProjectAsync("EDT");
+        await org.AddProjectMemberAsync(project.Id, bruno, ProjectRole.ProjectManager);
+        await org.AddProjectMemberAsync(project.Id, carla, ProjectRole.Developer);
 
         var byManager = await bruno.Client.PutJsonAsync($"{org.Projects}/{project.Id}", new UpdateProjectRequest("Renamed", "New description"));
         var byDeveloper = await carla.Client.PutJsonAsync($"{org.Projects}/{project.Id}", new UpdateProjectRequest("Hacked", null));
@@ -134,8 +132,8 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Archived_projects_are_read_only_until_unarchived()
     {
-        var org = await OrganizationAsync();
-        var project = await CreateProjectAsync(org, "ARC");
+        var org = await api.CreateOrganizationAsync();
+        var project = await org.CreateProjectAsync("ARC");
         var url = $"{org.Projects}/{project.Id}";
 
         Assert.Equal(HttpStatusCode.NoContent, (await org.Admin.Client.PostAsync($"{url}/archive", null)).StatusCode);
@@ -155,10 +153,10 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Deleted_projects_disappear_and_only_admins_delete()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var bruno = await org.AddMemberAsync("bruno");
-        var project = await CreateProjectAsync(org, "DEL");
-        await AddProjectMemberAsync(org, project.Id, bruno, ProjectRole.ProjectManager);
+        var project = await org.CreateProjectAsync("DEL");
+        await org.AddProjectMemberAsync(project.Id, bruno, ProjectRole.ProjectManager);
         var url = $"{org.Projects}/{project.Id}";
 
         var byManager = await bruno.Client.DeleteAsync(url);
@@ -177,9 +175,9 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Adding_a_member_gives_access_and_removing_it_takes_it_away()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var carla = await org.AddMemberAsync("carla");
-        var project = await CreateProjectAsync(org, "MEM");
+        var project = await org.CreateProjectAsync("MEM");
         var url = $"{org.Projects}/{project.Id}";
 
         Assert.Equal(HttpStatusCode.NotFound, (await carla.Client.GetAsync(url)).StatusCode);
@@ -199,9 +197,9 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Only_organization_members_can_join_a_project()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var stranger = await api.CreateUserAsync("stranger");
-        var project = await CreateProjectAsync(org, "ORG");
+        var project = await org.CreateProjectAsync("ORG");
         var url = $"{org.Projects}/{project.Id}/members";
 
         var notInOrganization = await org.Admin.Client.PostJsonAsync(url, new AddProjectMemberRequest(stranger.Email, ProjectRole.Developer));
@@ -219,8 +217,8 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task The_last_project_manager_cannot_be_demoted_or_removed()
     {
-        var org = await OrganizationAsync();
-        var project = await CreateProjectAsync(org, "LPM");
+        var org = await api.CreateOrganizationAsync();
+        var project = await org.CreateProjectAsync("LPM");
         var url = $"{org.Projects}/{project.Id}/members/{org.Admin.Id}";
 
         var demote = await org.Admin.Client.PutJsonAsync(url, new ChangeProjectMemberRoleRequest(ProjectRole.Developer));
@@ -234,52 +232,16 @@ public class ProjectEndpointsTests(ProjectFlowApiFactory api)
     [Fact]
     public async Task Developers_cannot_manage_project_members()
     {
-        var org = await OrganizationAsync();
+        var org = await api.CreateOrganizationAsync();
         var carla = await org.AddMemberAsync("carla");
         var diego = await org.AddMemberAsync("diego");
-        var project = await CreateProjectAsync(org, "DEV");
-        await AddProjectMemberAsync(org, project.Id, carla, ProjectRole.Developer);
+        var project = await org.CreateProjectAsync("DEV");
+        await org.AddProjectMemberAsync(project.Id, carla, ProjectRole.Developer);
 
         var response = await carla.Client.PostJsonAsync(
             $"{org.Projects}/{project.Id}/members",
             new AddProjectMemberRequest(diego.Email, ProjectRole.Developer));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
-    // ---------- Helpers ----------
-
-    private sealed record Org(ApiUser Admin, Guid Id, ProjectFlowApiFactory Api)
-    {
-        public string Projects => $"/api/organizations/{Id}/projects";
-
-        public async Task<ApiUser> AddMemberAsync(string name)
-        {
-            var user = await Api.CreateUserAsync(name);
-            var response = await Admin.Client.PostJsonAsync($"/api/organizations/{Id}/members", new AddMemberRequest(user.Email, OrganizationRole.Member));
-            response.EnsureSuccessStatusCode();
-            return user;
-        }
-    }
-
-    private async Task<Org> OrganizationAsync()
-    {
-        var admin = await api.CreateUserAsync("admin");
-        var response = await admin.Client.PostJsonAsync("/api/organizations", new CreateOrganizationCommand("Org", $"org-{TestData.Unique()}"));
-        response.EnsureSuccessStatusCode();
-        return new Org(admin, (await response.ReadAsync<OrganizationSummaryResponse>()).Id, api);
-    }
-
-    private static async Task<ProjectSummaryResponse> CreateProjectAsync(Org org, string key)
-    {
-        var response = await org.Admin.Client.PostJsonAsync(org.Projects, new CreateProjectRequest(key, $"Project {key}", null));
-        response.EnsureSuccessStatusCode();
-        return await response.ReadAsync<ProjectSummaryResponse>();
-    }
-
-    private static async Task AddProjectMemberAsync(Org org, Guid projectId, ApiUser user, ProjectRole role)
-    {
-        var response = await org.Admin.Client.PostJsonAsync($"{org.Projects}/{projectId}/members", new AddProjectMemberRequest(user.Email, role));
-        response.EnsureSuccessStatusCode();
     }
 }

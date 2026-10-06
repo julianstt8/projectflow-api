@@ -50,6 +50,8 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 ```
 
 - Tables and columns are snake_case (`EFCore.NamingConventions`); enums are stored as text, so `ORDER BY` an enum in SQL is alphabetical: order by enum value in memory after the query.
+- In read queries, apply `Where`/`OrderBy` on the entity **before** projecting to a response record: EF cannot translate members of a record built with its constructor.
+- Integration tests set up data through `api.CreateOrganizationAsync()` → `TestOrganization` (members, projects, project roles).
 - Entities are materialized through their constructors: constructor parameter names must match property names.
 - Every model change needs a migration; `ProjectFlow.Infrastructure.Tests` fails if one is missing.
 - Migrations run on startup only in Development with `Database:MigrateOnStartup=true` (set by docker-compose).

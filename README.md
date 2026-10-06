@@ -82,6 +82,10 @@ A user can belong to several organizations as `Admin` or `Member` (`/api/organiz
 
 Projects live inside an organization (`/api/organizations/{organizationId}/projects`). Organization admins create them (and become their project manager) and can soft-delete them; project managers edit, archive (read-only) and manage project members, who must belong to the organization. Project keys like `WEB` are unique within the organization and stay reserved after deletion.
 
+### Sprints
+
+Sprints belong to a project (`.../projects/{projectId}/sprints`) and go **Planned → Active → Completed**. A project has **at most one active sprint** (RF-05), enforced by the domain and by a partial unique index, so two simultaneous starts can never both succeed. Completing a sprint moves its unfinished tasks back to the backlog; done tasks stay in the sprint.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -170,6 +174,10 @@ Un usuario puede pertenecer a varias organizaciones como `Admin` o `Member` (`/a
 ### Proyectos
 
 Los proyectos viven dentro de una organización (`/api/organizations/{organizationId}/projects`). Los admins de la organización los crean (y quedan como project manager) y pueden eliminarlos (soft delete); los project managers los editan, los archivan (solo lectura) y gestionan sus miembros, que deben pertenecer a la organización. Las claves como `WEB` son únicas dentro de la organización y quedan reservadas tras eliminar el proyecto.
+
+### Sprints
+
+Los sprints pertenecen a un proyecto (`.../projects/{projectId}/sprints`) y pasan por **Planned → Active → Completed**. Un proyecto tiene **como máximo un sprint activo** (RF-05), garantizado por el dominio y por un índice único parcial, así que dos inicios simultáneos nunca pueden tener éxito a la vez. Al completar un sprint, sus tareas sin terminar vuelven al backlog; las terminadas se quedan en el sprint.
 
 ### Roles y permisos
 
