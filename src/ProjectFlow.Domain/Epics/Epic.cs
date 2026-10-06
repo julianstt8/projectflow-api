@@ -1,3 +1,4 @@
+using ProjectFlow.Domain.Activity;
 using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Projects;
 
@@ -43,7 +44,9 @@ public sealed class Epic : Entity, IOrganizationOwned
         }
 
         var (validName, validDescription) = details.Value;
-        return new Epic(Guid.CreateVersion7(now), project.Id, project.OrganizationId, validName, validDescription);
+        var epic = new Epic(Guid.CreateVersion7(now), project.Id, project.OrganizationId, validName, validDescription);
+        epic.RaiseLifecycle("Created");
+        return epic;
     }
 
     public Result UpdateDetails(string name, string? description)
@@ -66,6 +69,7 @@ public sealed class Epic : Entity, IOrganizationOwned
         }
 
         Status = EpicStatus.Closed;
+        RaiseLifecycle("Closed");
         return Result.Success();
     }
 
@@ -77,8 +81,12 @@ public sealed class Epic : Entity, IOrganizationOwned
         }
 
         Status = EpicStatus.Open;
+        RaiseLifecycle("Reopened");
         return Result.Success();
     }
+
+    private void RaiseLifecycle(string step) =>
+        Raise(new LifecycleChanged(OrganizationId, ProjectId, ActivityEntityTypes.Epic, Id, step, Name));
 
     private static Result<(string Name, string? Description)> ValidateDetails(string? name, string? description)
     {

@@ -1,3 +1,4 @@
+using ProjectFlow.Domain.Activity;
 using ProjectFlow.Domain.Common;
 using ProjectFlow.Domain.Projects;
 
@@ -55,7 +56,9 @@ public sealed class Sprint : Entity, IOrganizationOwned
         }
 
         var (validName, validGoal) = details.Value;
-        return new Sprint(Guid.CreateVersion7(now), project.Id, project.OrganizationId, validName, validGoal, startDate, endDate);
+        var sprint = new Sprint(Guid.CreateVersion7(now), project.Id, project.OrganizationId, validName, validGoal, startDate, endDate);
+        sprint.RaiseLifecycle("Created");
+        return sprint;
     }
 
     public Result UpdateDetails(string name, string? goal, DateOnly? startDate, DateOnly? endDate)
@@ -101,6 +104,7 @@ public sealed class Sprint : Entity, IOrganizationOwned
 
         StartDate = startDate;
         Status = SprintStatus.Active;
+        RaiseLifecycle("Started");
         return Result.Success();
     }
 
@@ -113,8 +117,12 @@ public sealed class Sprint : Entity, IOrganizationOwned
 
         EndDate ??= today;
         Status = SprintStatus.Completed;
+        RaiseLifecycle("Completed");
         return Result.Success();
     }
+
+    private void RaiseLifecycle(string step) =>
+        Raise(new LifecycleChanged(OrganizationId, ProjectId, ActivityEntityTypes.Sprint, Id, step, Name));
 
     private static Result<(string Name, string? Goal)> ValidateDetails(
         string? name,

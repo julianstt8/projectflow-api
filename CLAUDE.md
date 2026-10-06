@@ -71,6 +71,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Enums are serialized as strings in JSON.
 - Refresh tokens: one family per login, rotated on every use, family revoked on reuse; stored only as SHA-256. The refresh use case handles `ConcurrencyConflictException` itself (a lost race counts as reuse).
 - Task numbering (RF-04) locks the project row (`IProjectRepository.LockForTaskNumberingAsync` inside `IUnitOfWork.BeginTransactionAsync`) so concurrent creations wait instead of colliding. Task changes go through `TaskEditor`, which applies the developer "own or assigned" rule; use it for every new task-changing use case.
+- **Activity log (RF-10)**: entities raise `ProjectActivityEvent`s (`Domain/Activity/ActivityEvents.cs`) only when a value really changes; `UnitOfWork` turns them into `ActivityLog` rows (actor = current user, time = save time) in the same transaction. New project-scoped changes must raise an event. `activity_logs` is insert-only (DB trigger): never update or delete it.
 - Handlers use ports from `Application/Abstractions` (`IUserRepository`, `IUnitOfWork`, `IPasswordHasher`, `IAccessTokenGenerator`, `TimeProvider`); never `ApplicationDbContext` directly.
 
 ## Tests

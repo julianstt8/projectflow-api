@@ -94,6 +94,10 @@ Task status follows **ToDo → InProgress → Review → Done**, with Review →
 
 **Comments** (`.../tasks/{taskId}/comments`, RF-09) accept any language and Unicode text (accents, ñ, emoji). Viewers read but cannot comment; only the author edits a comment; the author or a project manager deletes it. **Labels** (`.../projects/{projectId}/labels`) are managed by project managers (unique names per project, ignoring case) and added to tasks with `PUT/DELETE .../tasks/{taskId}/labels/{labelId}`.
 
+### Activity log
+
+Every relevant change (task created, status, assignee, sprint, epic, labels, comments, sprint and epic lifecycle, project archive and membership) is recorded with **who, what, when, old and new value** (RF-10) in the same transaction as the change: a rejected change leaves no trace. Project managers and organization admins read it, newest first and paged, at `.../projects/{projectId}/activity` (`?entityId=` for the history of one task). The log is **insert-only**: a database trigger rejects any update or delete.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -194,6 +198,10 @@ Las **tareas** (`.../projects/{projectId}/tasks`) reciben claves consecutivas po
 El estado sigue **ToDo → InProgress → Review → Done**, con Review → InProgress como único retroceso (`POST .../tasks/{taskId}/status`, RF-07). Solo los project managers y admins de la organización reabren una tarea terminada (`POST .../tasks/{taskId}/reopen`, vuelve a InProgress, RF-08).
 
 Los **comentarios** (`.../tasks/{taskId}/comments`, RF-09) admiten cualquier idioma y texto Unicode (tildes, ñ, emojis). Los Viewers los leen pero no comentan; solo el autor edita su comentario; lo elimina el autor o un project manager. Las **etiquetas** (`.../projects/{projectId}/labels`) las gestionan los project managers (nombres únicos por proyecto, sin distinguir mayúsculas) y se añaden a las tareas con `PUT/DELETE .../tasks/{taskId}/labels/{labelId}`.
+
+### Registro de actividad
+
+Cada cambio relevante (tarea creada, estado, responsable, sprint, épica, etiquetas, comentarios, ciclo de vida de sprints y épicas, archivado y miembros del proyecto) queda registrado con **quién, qué, cuándo, valor anterior y nuevo** (RF-10) en la misma transacción que el cambio: un cambio rechazado no deja rastro. Lo leen los project managers y admins de la organización, del más reciente al más antiguo y paginado, en `.../projects/{projectId}/activity` (`?entityId=` para el historial de una tarea). El registro es **solo de inserción**: un trigger de la base de datos rechaza cualquier modificación o borrado.
 
 ### Roles y permisos
 
