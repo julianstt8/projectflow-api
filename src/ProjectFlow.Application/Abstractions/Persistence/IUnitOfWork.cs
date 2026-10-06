@@ -4,4 +4,15 @@ namespace ProjectFlow.Application.Abstractions.Persistence;
 public interface IUnitOfWork
 {
     Task SaveChangesAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Starts an explicit transaction, for use cases that must lock rows before reading them
+    /// (e.g. task numbering). Disposing it without <see cref="ITransaction.CommitAsync"/> rolls it back.
+    /// </summary>
+    Task<ITransaction> BeginTransactionAsync(CancellationToken cancellationToken);
+}
+
+public interface ITransaction : IAsyncDisposable
+{
+    Task CommitAsync(CancellationToken cancellationToken);
 }

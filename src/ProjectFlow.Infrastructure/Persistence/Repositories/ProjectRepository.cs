@@ -16,5 +16,8 @@ internal sealed class ProjectRepository(ApplicationDbContext dbContext) : IProje
             .Include(project => project.Members)
             .SingleOrDefaultAsync(project => project.Id == id, cancellationToken);
 
+    public Task LockForTaskNumberingAsync(Guid projectId, CancellationToken cancellationToken) =>
+        dbContext.Database.ExecuteSqlAsync($"SELECT 1 FROM projects WHERE id = {projectId} FOR UPDATE", cancellationToken);
+
     public void Add(Project project) => dbContext.Projects.Add(project);
 }

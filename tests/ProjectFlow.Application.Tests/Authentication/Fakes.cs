@@ -58,6 +58,16 @@ internal sealed class FakeUnitOfWork : IUnitOfWork
         SaveCount++;
         return Task.CompletedTask;
     }
+
+    public Task<ITransaction> BeginTransactionAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<ITransaction>(new NoTransaction());
+
+    private sealed class NoTransaction : ITransaction
+    {
+        public Task CommitAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
 }
 
 /// <summary>Sequential, readable tokens: "refresh-1", "refresh-2"... with hash "sha:refresh-1".</summary>
