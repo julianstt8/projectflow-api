@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Policy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using ProjectFlow.Application.Abstractions;
 using ProjectFlow.Domain.Organizations;
@@ -39,7 +37,8 @@ internal sealed class OrganizationRoleHandler(
     IHttpContextAccessor httpContextAccessor)
     : AuthorizationHandler<OrganizationRoleRequirement>
 {
-    public const string NotMemberReason = "NotOrganizationMember";
+    private static readonly NotFoundFailureReason NotMember =
+        new("Organization.NotFound", "The organization does not exist.");
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, OrganizationRoleRequirement requirement)
     {
@@ -48,7 +47,7 @@ internal sealed class OrganizationRoleHandler(
 
         if (organizationId is null || !Guid.TryParse(userIdClaim, out var userId))
         {
-            context.Fail(new AuthorizationFailureReason(this, NotMemberReason));
+            context.Fail(NotMember.For(this));
             return;
         }
 
@@ -57,7 +56,7 @@ internal sealed class OrganizationRoleHandler(
 
         if (role is null)
         {
-            context.Fail(new AuthorizationFailureReason(this, NotMemberReason));
+            context.Fail(NotMember.For(this));
             return;
         }
 
@@ -68,43 +67,5 @@ internal sealed class OrganizationRoleHandler(
         }
 
         context.Succeed(requirement);
-    }
-}
-
-/// <summary>
-/// Answers 404 instead of 403 when the user is not a member, so outsiders cannot even tell whether an
-/// organization exists. Members without the required role still get 403.
-/// </summary>
-internal sealed class OrganizationAuthorizationResultHandler(IProblemDetailsService problemDetailsService)
-    : IAuthorizationMiddlewareResultHandler
-{
-    private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new();
-
-    public async Task HandleAsync(
-        RequestDelegate next,
-        HttpContext context,
-        AuthorizationPolicy policy,
-        PolicyAuthorizationResult authorizeResult)
-    {
-        var notMember = authorizeResult.Forbidden
-            && authorizeResult.AuthorizationFailure?.FailureReasons.Any(reason => reason.Message == OrganizationRoleHandler.NotMemberReason) == true;
-
-        if (!notMember)
-        {
-            await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
-            return;
-        }
-
-        context.Response.StatusCode = StatusCodes.Status404NotFound;
-        await problemDetailsService.WriteAsync(new ProblemDetailsContext
-        {
-            HttpContext = context,
-            ProblemDetails = new ProblemDetails
-            {
-                Status = StatusCodes.Status404NotFound,
-                Title = "The organization does not exist.",
-                Extensions = { ["code"] = "Organization.NotFound" },
-            },
-        });
     }
 }
