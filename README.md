@@ -92,6 +92,8 @@ Sprints belong to a project (`.../projects/{projectId}/sprints`) and go **Planne
 
 Task status follows **ToDo → InProgress → Review → Done**, with Review → InProgress as the only step back (`POST .../tasks/{taskId}/status`, RF-07). Only project managers and organization admins reopen a done task (`POST .../tasks/{taskId}/reopen`, back to InProgress, RF-08).
 
+**Comments** (`.../tasks/{taskId}/comments`, RF-09) accept any language and Unicode text (accents, ñ, emoji). Viewers read but cannot comment; only the author edits a comment; the author or a project manager deletes it. **Labels** (`.../projects/{projectId}/labels`) are managed by project managers (unique names per project, ignoring case) and added to tasks with `PUT/DELETE .../tasks/{taskId}/labels/{labelId}`.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -190,6 +192,8 @@ Las **épicas** (`.../projects/{projectId}/epics`) agrupan tareas y muestran su 
 Las **tareas** (`.../projects/{projectId}/tasks`) reciben claves consecutivas por proyecto (`WEB-12`), seguras ante creaciones simultáneas: la fila del proyecto se bloquea mientras se numera. Tienen tipo, prioridad, puntos (0–100), responsable (alguien que trabaja en el proyecto), sprint (o backlog) y épica. Un Developer solo puede cambiar las tareas que creó o tiene asignadas; solo los project managers las eliminan (soft delete). Las tareas terminadas son de solo lectura.
 
 El estado sigue **ToDo → InProgress → Review → Done**, con Review → InProgress como único retroceso (`POST .../tasks/{taskId}/status`, RF-07). Solo los project managers y admins de la organización reabren una tarea terminada (`POST .../tasks/{taskId}/reopen`, vuelve a InProgress, RF-08).
+
+Los **comentarios** (`.../tasks/{taskId}/comments`, RF-09) admiten cualquier idioma y texto Unicode (tildes, ñ, emojis). Los Viewers los leen pero no comentan; solo el autor edita su comentario; lo elimina el autor o un project manager. Las **etiquetas** (`.../projects/{projectId}/labels`) las gestionan los project managers (nombres únicos por proyecto, sin distinguir mayúsculas) y se añaden a las tareas con `PUT/DELETE .../tasks/{taskId}/labels/{labelId}`.
 
 ### Roles y permisos
 
