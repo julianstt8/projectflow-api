@@ -131,6 +131,8 @@ Every error is returned as [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Pr
 
 CI (GitHub Actions) checks formatting, builds, runs the tests and builds the Docker image on every pull request.
 
+CI also checks for vulnerable packages and leaked secrets and reports test coverage. Architecture decisions are recorded in [`docs/adr`](docs/adr/README.md) and accepted shortcuts in [`docs/tech-debt.md`](docs/tech-debt.md).
+
 ---
 
 ## Español
@@ -216,3 +218,5 @@ La matriz completa está en la sección en inglés. Los roles se comprueban cont
 Todos los errores se devuelven como ProblemDetails (RFC 9457, `application/problem+json`) con un `code` estable y un `traceId`: 400 petición inválida (con `errors` por campo), 401/403 sin autenticar / sin permiso, 404 no existe o no es visible para el usuario, 409 choca con datos existentes (valor duplicado, cambio concurrente), 422 petición válida que rompe una regla de negocio.
 
 El CI (GitHub Actions) revisa el formato, compila, ejecuta las pruebas y construye la imagen Docker en cada pull request.
+
+El CI también revisa paquetes con vulnerabilidades y secretos filtrados, y reporta la cobertura de pruebas. Las decisiones de arquitectura están en [`docs/adr`](docs/adr/README.md) y los atajos aceptados en [`docs/tech-debt.md`](docs/tech-debt.md).

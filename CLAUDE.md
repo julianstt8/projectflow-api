@@ -82,6 +82,12 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - PostgreSQL tests use **Testcontainers** (throwaway `postgres:17-alpine` per test run), so **Docker must be running** for `dotnet test`. Never use the EF in-memory provider.
 - Tests that need a database share one container per assembly through an xUnit collection fixture; use unique values (`TestData.Unique()`) instead of cleaning tables.
 
+## Docs and quality
+
+- `docs/adr/`: architecture decision records (EN/ES). Read the relevant ADR before changing an architectural rule, and add a new ADR (copy `template.md`) when a decision changes; never delete old ones, mark them `Superseded`.
+- `docs/tech-debt.md`: register of shortcuts accepted on purpose. Add an entry instead of leaving a `TODO`; review it at the end of every milestone.
+- CI also checks vulnerable NuGet packages (`dotnet list package --vulnerable`), scans for secrets (gitleaks, config in `.gitleaks.toml`) and reports test coverage in the job summary. CodeQL runs only on public repos or when the repository variable `ENABLE_CODEQL` is `true`. Dependabot opens weekly update PRs.
+
 ## Rules
 
 - Code, commits, issues and PRs in **English**. Public docs (README, docs/) bilingual EN/ES.

@@ -1,0 +1,12 @@
+# Gitleaks configuration. Extends the default rules and allows the fictional
+# values that are published on purpose (local demo data and docker-compose defaults).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Fictional local-development values"
+regexes = [
+  '''ProjectFlow-Dev-2026''',
+  '''projectflow_dev''',
+  '''change-me''',
+]

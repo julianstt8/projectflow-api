@@ -26,6 +26,14 @@ jobs:
       - name: Restore
         run: dotnet restore
 
+      - name: Check vulnerable packages
+        run: |
+          dotnet list ProjectFlow.slnx package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::error::Vulnerable NuGet packages found. See the log above."
+            exit 1
+          fi
+
       - name: Check formatting
         run: dotnet format --verify-no-changes --no-restore
 
@@ -33,7 +41,27 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --logger "trx;LogFilePrefix=results"
+        run: >
+          dotnet test --configuration Release --no-build
+          --logger "trx;LogFilePrefix=results"
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults
+
+      - name: Coverage summary
+        if: always()
+        continue-on-error: true
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool --version "5.*"
+          reportgenerator -reports:"TestResults/**/coverage.cobertura.xml" -targetdir:coverage-report -reporttypes:"MarkdownSummaryGithub;Cobertura" -title:"Coverage"
+          if [ -f coverage-report/SummaryGithub.md ]; then cat coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
+          if-no-files-found: ignore
 
       - name: Upload test results
         if: always()
@@ -41,6 +69,22 @@ jobs:
         with:
           name: test-results
           path: "**/TestResults/*.trx"
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker:
     name: Docker image
