@@ -90,7 +90,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 
 ## Rules
 
-- Code, commits, issues and PRs in **English**. Public docs (README, docs/) bilingual EN/ES.
+- Code, commits and issues in **English**. Pull request descriptions **bilingual EN/ES** (English first, then Spanish, same content) so the review is precise for both languages; use `.github/pull_request_template.md`. Public docs (README, docs/) bilingual EN/ES.
 - Conventional Commits (`feat: add task endpoints`). Branches like `feature/task-status-flow`.
 - Nothing reaches `main` without a Pull Request and passing tests (from milestone 1 onwards).
 - Secrets never in the repository: use user-secrets or environment variables.
