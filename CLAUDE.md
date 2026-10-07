@@ -84,6 +84,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 
 ## Docs and quality
 
+- **Two gates for every change** (`docs/engineering-workflow.md`): before writing code, read this file and the relevant ADRs, copy an existing pattern and write a short plan; after writing it, review the diff against the checklist there and in the PR template. Do not skip either gate.
 - `docs/adr/`: architecture decision records (EN/ES). Read the relevant ADR before changing an architectural rule, and add a new ADR (copy `template.md`) when a decision changes; never delete old ones, mark them `Superseded`.
 - `docs/tech-debt.md`: register of shortcuts accepted on purpose. Add an entry instead of leaving a `TODO`; review it at the end of every milestone.
 - CI also checks vulnerable NuGet packages (`dotnet list package --vulnerable`), scans for secrets (gitleaks, config in `.gitleaks.toml`) and reports test coverage in the job summary. CodeQL runs only on public repos or when the repository variable `ENABLE_CODEQL` is `true`. Dependabot opens weekly update PRs.
