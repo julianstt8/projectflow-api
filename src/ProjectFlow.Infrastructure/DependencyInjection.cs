@@ -47,6 +47,9 @@ public static class DependencyInjection
         services.AddScoped<IOrganizationMembership, OrganizationMembership>();
         services.AddScoped<IProjectAccessResolver, ProjectAccessResolver>();
 
+        // /health fails (503) when PostgreSQL is unreachable.
+        services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("postgresql");
+
         services.TryAddSingleton(TimeProvider.System);
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<DevelopmentDataSeeder>();

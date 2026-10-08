@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Mediator;
 using ProjectFlow.Api.Authentication;
 using ProjectFlow.Api.ErrorHandling;
+using ProjectFlow.Api.Observability;
 using ProjectFlow.Api.Organizations;
 using ProjectFlow.Application;
 using ProjectFlow.Application.Abstractions;
@@ -10,6 +11,8 @@ using ProjectFlow.Infrastructure;
 using ProjectFlow.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddProjectFlowLogging();
 
 builder.Services
     .AddApplication()
@@ -35,6 +38,8 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.UseCorrelationId();
+app.UseProjectFlowRequestLogging();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
