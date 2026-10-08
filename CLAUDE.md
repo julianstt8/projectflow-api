@@ -54,6 +54,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Integration tests set up data through `api.CreateOrganizationAsync()` → `TestOrganization` (members, projects, project roles) and `api.AddTaskAsync(...)` for tasks.
 - Entities are materialized through their constructors: constructor parameter names must match property names.
 - Every model change needs a migration; `ProjectFlow.Infrastructure.Tests` fails if one is missing.
+- Indexes EF Core cannot model (expressions such as `lower(name)`) and triggers are created with `migrationBuilder.Sql` in an otherwise empty migration, and covered by a test in `Persistence/UniqueConstraintTests` or similar. Use cases that rely on such an index catch `UniqueConstraintViolationException` and return their own error (e.g. `LabelTarget.SaveAsync`).
 - Migrations run on startup only in Development with `Database:MigrateOnStartup=true` (set by docker-compose).
 - Demo data (`Persistence/Seeding/DevelopmentDataSeeder.cs`) is loaded only in Development with `Database:SeedOnStartup=true`, once (idempotent). Build it through domain methods, never with raw inserts.
 - Running the API outside Docker needs `ConnectionStrings:Default`, e.g. `dotnet user-secrets set ConnectionStrings:Default "<connection string>" --project src/ProjectFlow.Api`.

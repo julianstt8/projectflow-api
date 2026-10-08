@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using ProjectFlow.Api.IntegrationTests.Infrastructure;
 using ProjectFlow.Domain.Organizations;
@@ -56,6 +57,36 @@ public class UniqueConstraintTests(ProjectFlowApiFactory api)
         var exception = await Record.ExceptionAsync(() => api.SeedProjectAsync("SHARED"));
 
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task Label_name_is_unique_within_a_project_ignoring_case()
+    {
+        var project = await api.SeedProjectAsync();
+        await InsertLabelAsync(project, "Backend");
+
+        await DatabaseAssert.RejectedAsync(
+            () => InsertLabelAsync(project, "BACKEND"),
+            PostgresErrorCodes.UniqueViolation,
+            "ix_labels_project_id_lower_name");
+    }
+
+    [Fact]
+    public async Task Same_label_name_is_allowed_in_different_projects()
+    {
+        await InsertLabelAsync(await api.SeedProjectAsync(), "backend");
+
+        var exception = await Record.ExceptionAsync(async () => await InsertLabelAsync(await api.SeedProjectAsync(), "backend"));
+
+        Assert.Null(exception);
+    }
+
+    // Raw SQL: the domain and the use case already refuse duplicates, the index is the last line of defense.
+    private async Task InsertLabelAsync(SeededProject project, string name)
+    {
+        await using var dbContext = api.CreateDbContext(organizationId: null);
+        await dbContext.Database.ExecuteSqlInterpolatedAsync(
+            $"INSERT INTO labels (id, project_id, organization_id, name, color) VALUES ({Guid.NewGuid()}, {project.ProjectId}, {project.OrganizationId}, {name}, '#1D76DB')");
     }
 
     private async Task SaveAsync(params object[] entities)
