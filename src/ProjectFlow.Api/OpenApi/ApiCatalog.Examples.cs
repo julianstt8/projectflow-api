@@ -70,7 +70,7 @@ internal static partial class ApiCatalog
         // Responses
         [typeof(UserResponse)] = new UserResponse(Ana, "ana.admin@example.com", "Ana Admin"),
         [typeof(TokenResponse)] = new TokenResponse(
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZjhmYWQ1YiJ9.c2lnbmF0dXJl", "Bearer", Now.AddMinutes(15),
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…", "Bearer", Now.AddMinutes(15),
             "hT8sN0q3vX1kP5wZ2mR7cY4bL9dF6gJ0aE3uI8oQ1tS", Now.AddDays(7)),
         [typeof(CurrentUserResponse)] = new CurrentUserResponse(Ana, "ana.admin@example.com", "Ana Admin"),
         [typeof(OrganizationSummaryResponse)] = new OrganizationSummaryResponse(Acme, "Acme Software", "acme-software", OrganizationRole.Admin),
