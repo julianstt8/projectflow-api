@@ -135,6 +135,27 @@ public class ApiReferenceTests(ProjectFlowApiFactory api)
     }
 
     [Fact]
+    public async Task Error_examples_have_the_problem_type_the_api_really_returns()
+    {
+        var organization = await api.CreateOrganizationAsync();
+        var project = await organization.CreateProjectAsync("TYP");
+        var taskId = await api.AddTaskAsync(organization.Id, project.Id);
+        var outsider = await api.CreateUserAsync("outsider");
+
+        var invalidTransition = await organization.Admin.Client.PostJsonAsync(
+            $"/api/organizations/{organization.Id}/projects/{project.Id}/tasks/{taskId}/status", new { status = "Done" });
+        var notMember = await outsider.Client.GetAsync($"/api/organizations/{organization.Id}");
+        var operations = Operations(await DocumentAsync("en"));
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, invalidTransition.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, notMember.StatusCode);
+        Assert.Equal(
+            await ProblemTypeAsync(invalidTransition),
+            ExampleType(operations["post /api/organizations/{organizationId}/projects/{projectId}/tasks/{taskId}/status"], "422"));
+        Assert.Equal(await ProblemTypeAsync(notMember), ExampleType(operations["get /api/organizations/{organizationId}"], "404"));
+    }
+
+    [Fact]
     public async Task Every_body_has_an_example()
     {
         var document = await DocumentAsync("en");
@@ -250,6 +271,13 @@ public class ApiReferenceTests(ProjectFlowApiFactory api)
         response.EnsureSuccessStatusCode();
         return JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
     }
+
+    private static async Task<string?> ProblemTypeAsync(HttpResponseMessage response) =>
+        JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement.GetProperty("type").GetString();
+
+    private static string? ExampleType(JsonElement operation, string status) =>
+        operation.GetProperty("responses").GetProperty(status).GetProperty("content").GetProperty("application/problem+json")
+            .GetProperty("example").GetProperty("type").GetString();
 
     /// <summary>"method /path" → operation object.</summary>
     private static Dictionary<string, JsonElement> Operations(JsonElement document) =>

@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using ProjectFlow.Api.ErrorHandling;
 using ProjectFlow.Domain.Common;
@@ -94,7 +95,7 @@ internal static class OperationDescriber
                 operation.Responses[statusErrors.Key] = response;
             }
 
-            DescribeErrorResponse((OpenApiResponse)response, [.. statusErrors], context.Document, language);
+            DescribeErrorResponse((OpenApiResponse)response, [.. statusErrors], context, language);
         }
 
         // Authorization errors were added last: show every response in status order.
@@ -123,7 +124,11 @@ internal static class OperationDescriber
         }
     }
 
-    private static void DescribeErrorResponse(OpenApiResponse response, IReadOnlyList<Error> errors, OpenApiDocument? document, string language)
+    private static void DescribeErrorResponse(
+        OpenApiResponse response,
+        IReadOnlyList<Error> errors,
+        OpenApiOperationTransformerContext context,
+        string language)
     {
         var status = errors[0].Type.ToStatusCode();
         var codes = errors.Select(error => $"- `{error.Code}`: {ApiCatalog.ErrorTexts.GetValueOrDefault(error.Code).In(language)}");
@@ -131,18 +136,20 @@ internal static class OperationDescriber
             $"{ApiCatalog.Statuses[status].In(language)} {ApiCatalog.PossibleCodes.In(language)}\n{string.Join('\n', codes)}";
 
         // Errors are always application/problem+json; keep the declared schema (ValidationProblemDetails for 400).
-        var schema = response.Content?.Values.FirstOrDefault()?.Schema ?? new OpenApiSchemaReference("ProblemDetails", document);
+        var schema = response.Content?.Values.FirstOrDefault()?.Schema ?? new OpenApiSchemaReference("ProblemDetails", context.Document);
         response.Content = new Dictionary<string, OpenApiMediaType>
         {
-            ["application/problem+json"] = new() { Schema = schema, Example = ProblemExample(errors[0], status) },
+            ["application/problem+json"] = new() { Schema = schema, Example = ProblemExample(errors[0], status, context.ApplicationServices) },
         };
     }
 
-    private static JsonObject ProblemExample(Error error, int status)
+    private static JsonObject ProblemExample(Error error, int status, IServiceProvider services)
     {
+        // The same links ASP.NET Core writes in real responses, so the examples cannot drift from them.
+        var clientErrors = services.GetRequiredService<IOptions<ApiBehaviorOptions>>().Value.ClientErrorMapping;
         var problem = new JsonObject
         {
-            ["type"] = ProblemTypes[status],
+            ["type"] = clientErrors.TryGetValue(status, out var clientError) ? clientError.Link : null,
             ["title"] = error.Description,
             ["status"] = status,
         };
@@ -156,14 +163,4 @@ internal static class OperationDescriber
         problem["traceId"] = TraceIdExample;
         return problem;
     }
-
-    private static readonly Dictionary<int, string> ProblemTypes = new()
-    {
-        [StatusCodes.Status400BadRequest] = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
-        [StatusCodes.Status401Unauthorized] = "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-        [StatusCodes.Status403Forbidden] = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-        [StatusCodes.Status404NotFound] = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
-        [StatusCodes.Status409Conflict] = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
-        [StatusCodes.Status422UnprocessableEntity] = "https://tools.ietf.org/html/rfc9110#section-15.5.21",
-    };
 }
