@@ -100,6 +100,10 @@ Task status follows **ToDo → InProgress → Review → Done**, with Review →
 
 Every relevant change (task created, status, assignee, sprint, epic, labels, comments, sprint and epic lifecycle, project archive and membership) is recorded with **who, what, when, old and new value** (RF-10) in the same transaction as the change: a rejected change leaves no trace. Project managers and organization admins read it, newest first and paged, at `.../projects/{projectId}/activity` (`?entityId=` for the history of one task). The log is **insert-only**: a database trigger rejects any update or delete.
 
+### Logs and health
+
+Logs are structured JSON on the console (Serilog): one line per request with method, path, status and duration, and a `CorrelationId` on every line. The correlation id is returned in the `X-Correlation-Id` header and equals the `traceId` of error responses, so an error a client reports can be found in the logs. Bodies, headers and query strings are never logged. `GET /health` answers `Healthy` (200) or `Unhealthy` (503) and checks that PostgreSQL is reachable. Log levels are set in the `Serilog` section of `appsettings.json`.
+
 ### Roles and permissions
 
 | Action | Org admin | Project manager | Developer | Viewer |
@@ -208,6 +212,10 @@ Los **comentarios** (`.../tasks/{taskId}/comments`, RF-09) admiten cualquier idi
 ### Registro de actividad
 
 Cada cambio relevante (tarea creada, estado, responsable, sprint, épica, etiquetas, comentarios, ciclo de vida de sprints y épicas, archivado y miembros del proyecto) queda registrado con **quién, qué, cuándo, valor anterior y nuevo** (RF-10) en la misma transacción que el cambio: un cambio rechazado no deja rastro. Lo leen los project managers y admins de la organización, del más reciente al más antiguo y paginado, en `.../projects/{projectId}/activity` (`?entityId=` para el historial de una tarea). El registro es **solo de inserción**: un trigger de la base de datos rechaza cualquier modificación o borrado.
+
+### Logs y salud
+
+Los logs son JSON estructurado en la consola (Serilog): una línea por petición con método, ruta, estado y duración, y un `CorrelationId` en cada línea. El correlation id se devuelve en la cabecera `X-Correlation-Id` y es igual al `traceId` de las respuestas de error, así que un error que reporta un cliente se encuentra en los logs. Nunca se registran cuerpos, cabeceras ni query strings. `GET /health` responde `Healthy` (200) o `Unhealthy` (503) y comprueba que PostgreSQL responde. Los niveles de log se configuran en la sección `Serilog` de `appsettings.json`.
 
 ### Roles y permisos
 
