@@ -156,6 +156,7 @@ public sealed class TasksController(ISender sender) : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public Task<IActionResult> Delete(Guid organizationId, Guid projectId, Guid taskId, CancellationToken cancellationToken) =>
         SendAsync(new DeleteTaskCommand(organizationId, projectId, taskId), cancellationToken);
 

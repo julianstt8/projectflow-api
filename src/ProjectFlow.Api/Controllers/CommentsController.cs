@@ -47,6 +47,7 @@ public sealed class CommentsController(ISender sender) : ApiControllerBase
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public Task<IActionResult> Edit(Guid organizationId, Guid projectId, Guid taskId, Guid commentId, CommentRequest request, CancellationToken cancellationToken) =>
         SendAsync(new EditCommentCommand(projectId, taskId, commentId, request.Body), cancellationToken);
 
@@ -56,6 +57,7 @@ public sealed class CommentsController(ISender sender) : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public Task<IActionResult> Delete(Guid organizationId, Guid projectId, Guid taskId, Guid commentId, CancellationToken cancellationToken) =>
         SendAsync(new DeleteCommentCommand(organizationId, projectId, taskId, commentId), cancellationToken);
 

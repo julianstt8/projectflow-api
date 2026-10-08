@@ -1,0 +1,3 @@
+# Findings reviewed and accepted as false positives (one fingerprint per line: commit:file:rule:line).
+# Fictional, truncated-later example access token in the API reference examples (PR #64); never a real credential.
+d28792aade1901b42c205c26b8a2add2339e20cf:src/ProjectFlow.Api/OpenApi/ApiCatalog.Examples.cs:jwt:73

@@ -12,6 +12,8 @@ Short notes that explain **why** an important technical decision was taken, so i
 | [0004](0004-roles-resolved-per-request.md) | Roles resolved per request, never in the token | Accepted |
 | [0005](0005-refresh-token-rotation.md) | Refresh token rotation with family revocation | Accepted |
 | [0006](0006-insert-only-activity-log.md) | Insert-only activity log enforced by a database trigger | Accepted |
+| [0007](0007-api-reference-with-openapi-and-scalar.md) | API reference with built-in OpenAPI and Scalar (Development only) | Accepted; texts replaced by 0008 |
+| [0008](0008-bilingual-api-reference-catalog.md) | Bilingual API reference (EN/ES) from a text catalog | Accepted |
 | [0007](0007-api-reference-with-openapi-and-scalar.md) | API reference with built-in OpenAPI and Scalar (Development only) | Accepted |
 | [0009](0009-structured-logging-with-serilog.md) | Structured logging with Serilog, request logging and correlation id | Accepted |
 
