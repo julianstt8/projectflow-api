@@ -39,7 +39,7 @@ dotnet build
 dotnet test
 dotnet run --project src/ProjectFlow.Api
 dotnet format                 # CI runs `dotnet format --verify-no-changes`
-docker compose up --build     # API on http://localhost:5080 + PostgreSQL
+docker compose up --build     # API on http://localhost:5080 + PostgreSQL (port from .env, default 5432)
 ```
 
 ### Database (EF Core)
@@ -55,8 +55,8 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Entities are materialized through their constructors: constructor parameter names must match property names.
 - Every model change needs a migration; `ProjectFlow.Infrastructure.Tests` fails if one is missing.
 - Indexes EF Core cannot model (expressions such as `lower(name)`) and triggers are created with `migrationBuilder.Sql` in an otherwise empty migration, and covered by a test in `Persistence/UniqueConstraintTests` or similar. Use cases that rely on such an index catch `UniqueConstraintViolationException` and return their own error (e.g. `LabelTarget.SaveAsync`).
-- Migrations run on startup only in Development with `Database:MigrateOnStartup=true` (set by docker-compose).
-- Demo data (`Persistence/Seeding/DevelopmentDataSeeder.cs`) is loaded only in Development with `Database:SeedOnStartup=true`, once (idempotent). Build it through domain methods, never with raw inserts.
+- Migrations run on startup only when `Database:MigrateOnStartup=true` (docker-compose and the public demo set it; off by default).
+- Demo data (`Persistence/Seeding/DevelopmentDataSeeder.cs`) is loaded only when configured: `Database:SeedOnStartup=true` (docker-compose), once (idempotent), or by the daily reset of the public demo (`Demo:ResetIntervalHours`, `DemoDataReset`, ADR 0010), which empties every table first. Build it through domain methods, never with raw inserts. Tests that empty tables use `PostgreSqlFixture.CreateIsolatedDatabaseAsync()`.
 - Running the API outside Docker needs `ConnectionStrings:Default`, e.g. `dotnet user-secrets set ConnectionStrings:Default "<connection string>" --project src/ProjectFlow.Api`.
 
 ## API conventions
@@ -70,7 +70,7 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - Project-scoped endpoints live under `/api/organizations/{organizationId}/projects/{projectId}/...` and carry `[RequireProjectPermission(ProjectPermission.X)]`. The matrix lives in `Domain/Projects/ProjectPermissions.cs` (organization admins have every permission). Users who cannot see the project get 404, users missing the permission get 403. Rules on a specific resource (developers edit only tasks they reported or are assigned to) are checked in the use case with `IProjectAccessResolver` → `ProjectAccess.CanEditTask`.
 - Changing the permission matrix means updating `ProjectPermissionsTests` (domain) and `ProjectAuthorizationTests` (API) on purpose: both spell the PRD matrix out by hand.
 - Enums are serialized as strings in JSON.
-- **API reference**: OpenAPI (built into .NET 10) + Scalar at `/scalar`, Development only, one document per language (`/openapi/en.json`, `/openapi/es.json`) with a selector in Scalar. Texts live in `OpenApi/ApiCatalog*.cs`, English and Spanish side by side: a new action needs an entry in `ApiCatalog.Operations` (title, description and the `Error`s its use case can return) and new request fields or parameters need entries in `ApiCatalog.Fields`; add an instance of new request and response types to `ApiCatalog.Examples`. Who can call an endpoint and the authorization errors (401/403/404) are generated from its policies and `ProjectPermissions`: never write them by hand. Declare `[ProducesResponseType]` for every status the use case can return: the document fails to generate otherwise, and `ApiReferenceTests` fails when a text is missing in either language. Every public type still needs an XML comment (CS1591 is not suppressed). See ADR 0007 and 0008.
+- **API reference**: OpenAPI (built into .NET 10) + Scalar at `/scalar`, Development only unless `ApiReference:Enabled=true` (the public demo, ADR 0010), one document per language (`/openapi/en.json`, `/openapi/es.json`) with a selector in Scalar. Texts live in `OpenApi/ApiCatalog*.cs`, English and Spanish side by side: a new action needs an entry in `ApiCatalog.Operations` (title, description and the `Error`s its use case can return) and new request fields or parameters need entries in `ApiCatalog.Fields`; add an instance of new request and response types to `ApiCatalog.Examples`. Who can call an endpoint and the authorization errors (401/403/404) are generated from its policies and `ProjectPermissions`: never write them by hand. Declare `[ProducesResponseType]` for every status the use case can return: the document fails to generate otherwise, and `ApiReferenceTests` fails when a text is missing in either language. Every public type still needs an XML comment (CS1591 is not suppressed). See ADR 0007 and 0008.
 - Refresh tokens: one family per login, rotated on every use, family revoked on reuse; stored only as SHA-256. The refresh use case handles `ConcurrencyConflictException` itself (a lost race counts as reuse).
 - Task numbering (RF-04) locks the project row (`IProjectRepository.LockForTaskNumberingAsync` inside `IUnitOfWork.BeginTransactionAsync`) so concurrent creations wait instead of colliding. Task changes go through `TaskEditor`, which applies the developer "own or assigned" rule; use it for every new task-changing use case.
 - **Activity log (RF-10)**: entities raise `ProjectActivityEvent`s (`Domain/Activity/ActivityEvents.cs`) only when a value really changes; `UnitOfWork` turns them into `ActivityLog` rows (actor = current user, time = save time) in the same transaction. New project-scoped changes must raise an event. `activity_logs` is insert-only (DB trigger): never update or delete it.
@@ -84,6 +84,10 @@ dotnet ef migrations add <Name> --project src/ProjectFlow.Infrastructure --start
 - `ProjectFlow.Api.IntegrationTests`: the real API (`ProjectFlowApiFactory`) against PostgreSQL; covers migrations, constraints and concurrency, and later the HTTP endpoints.
 - PostgreSQL tests use **Testcontainers** (throwaway `postgres:17-alpine` per test run), so **Docker must be running** for `dotnet test`. Never use the EF in-memory provider.
 - Tests that need a database share one container per assembly through an xUnit collection fixture; use unique values (`TestData.Unique()`) instead of cleaning tables.
+
+## Public demo
+
+`render.yaml` deploys `main` to Render (free web service, Docker) with PostgreSQL on Neon, only when CI is green (ADR 0010). Everything demo-specific is configuration in `render.yaml` (`ApiReference__Enabled`, `Database__MigrateOnStartup`, `Demo__ResetIntervalHours`, forwarded headers); never add `if demo` branches to the code. Secrets (JWT key, connection string) live only in Render.
 
 ## Docs and quality
 

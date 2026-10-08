@@ -14,8 +14,9 @@ using ProjectFlow.Domain.Users;
 namespace ProjectFlow.Infrastructure.Persistence.Seeding;
 
 /// <summary>
-/// Fake, clearly fictional data for local development and demos. Everything is built through the domain
-/// model, so the seed obeys the same rules as the API. Runs only in Development and only once.
+/// Fake, clearly fictional data for local development and the public demo. Everything is built through the domain
+/// model, so the seed obeys the same rules as the API. Runs only when configured (<c>Database:SeedOnStartup</c>, or the
+/// demo reset of ADR 0010) and only once.
 /// </summary>
 internal sealed class DevelopmentDataSeeder(
     ApplicationDbContext dbContext,
@@ -23,7 +24,10 @@ internal sealed class DevelopmentDataSeeder(
     TimeProvider timeProvider,
     ILogger<DevelopmentDataSeeder> logger)
 {
-    /// <summary>Password of every seeded user. Development only: these accounts must never exist elsewhere.</summary>
+    /// <summary>
+    /// Password of every seeded user. Published on purpose (README): these accounts exist only in local development and
+    /// in the public demo, whose data is fictional and restored every day. Never seed them in a real environment.
+    /// </summary>
     public const string Password = "ProjectFlow-Dev-2026";
 
     public const string AcmeSlug = "acme-software";
