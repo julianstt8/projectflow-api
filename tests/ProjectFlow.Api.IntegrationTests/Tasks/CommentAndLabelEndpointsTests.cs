@@ -148,6 +148,27 @@ public class CommentAndLabelEndpointsTests(ProjectFlowApiFactory api)
     }
 
     [Fact]
+    public async Task Labels_created_at_the_same_time_with_the_same_name_keep_only_one()
+    {
+        var world = await WorldAsync();
+        string[] names = ["Release", "release", "RELEASE", "ReLeAsE"];
+
+        var responses = await Task.WhenAll(names.Select(name =>
+            world.Org.Admin.Client.PostJsonAsync(Labels(world), new LabelRequest(name, "#1D76DB"))));
+
+        // Whichever stops a duplicate (the name check or, in a race, the unique index), the answer is the same.
+        Assert.Single(responses, response => response.StatusCode == HttpStatusCode.Created);
+        foreach (var rejected in responses.Where(response => response.StatusCode != HttpStatusCode.Created))
+        {
+            Assert.Equal(HttpStatusCode.Conflict, rejected.StatusCode);
+            Assert.Equal("Label.NameTaken", await rejected.ReadErrorCodeAsync());
+        }
+
+        var labels = await (await world.Org.Admin.Client.GetAsync(Labels(world))).ReadAsync<List<LabelResponse>>();
+        Assert.Single(labels, label => label.Name.Equals("release", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public async Task Only_project_managers_manage_labels()
     {
         var world = await WorldAsync();

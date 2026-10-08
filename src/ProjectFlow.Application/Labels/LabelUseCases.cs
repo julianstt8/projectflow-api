@@ -68,7 +68,11 @@ public sealed class CreateLabelCommandHandler(
         }
 
         labels.Add(label.Value);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        var saved = await LabelTarget.SaveAsync(unitOfWork, cancellationToken);
+        if (saved.IsFailure)
+        {
+            return saved.Error;
+        }
 
         return new LabelResponse(label.Value.Id, label.Value.Name, label.Value.Color);
     }
@@ -107,8 +111,7 @@ public sealed class UpdateLabelCommandHandler(IProjectRepository projects, ILabe
             return LabelUseCaseErrors.NameTaken;
         }
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Result.Success();
+        return await LabelTarget.SaveAsync(unitOfWork, cancellationToken);
     }
 }
 
@@ -173,6 +176,23 @@ public sealed class RemoveTaskLabelCommandHandler(TaskEditor editor, TimeProvide
 
 internal static class LabelTarget
 {
+    /// <summary>
+    /// Saves a new or renamed label. The name check above covers the normal case; when a concurrent request takes the
+    /// same name first, the unique index on <c>(project_id, lower(name))</c> stops this one with the same error.
+    /// </summary>
+    public static async Task<Result> SaveAsync(IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+        catch (UniqueConstraintViolationException)
+        {
+            return LabelUseCaseErrors.NameTaken;
+        }
+    }
+
     public static async Task<Result<Label>> LoadAsync(
         IProjectRepository projects,
         ILabelRepository labels,

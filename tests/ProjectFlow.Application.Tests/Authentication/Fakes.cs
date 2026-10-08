@@ -47,12 +47,21 @@ internal sealed class FakeUnitOfWork : IUnitOfWork
     /// <summary>When set, the next save fails as if another request had saved first.</summary>
     public bool FailNextSaveWithConflict { get; set; }
 
+    /// <summary>When set, the next save fails as if a unique index had rejected a value another request saved first.</summary>
+    public string? FailNextSaveWithDuplicateOn { get; set; }
+
     public Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         if (FailNextSaveWithConflict)
         {
             FailNextSaveWithConflict = false;
             throw new ConcurrencyConflictException(new InvalidOperationException("Simulated conflict"));
+        }
+
+        if (FailNextSaveWithDuplicateOn is { } constraint)
+        {
+            FailNextSaveWithDuplicateOn = null;
+            throw new UniqueConstraintViolationException(constraint, new InvalidOperationException("Simulated duplicate"));
         }
 
         SaveCount++;

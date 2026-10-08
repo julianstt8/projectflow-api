@@ -6,8 +6,10 @@ Every shortcut that is accepted on purpose is written here, so it is a decision 
 
 | What | Why it was accepted | Risk | Pay by (date or event) | Issue |
 |---|---|---|---|---|
-| Label names are unique per project only in the use case (no unique index) | Low impact; a case-insensitive unique index needs a functional index on `lower(name)` | Two simultaneous creations with the same name could both succeed | When labels are created concurrently in practice, or before the first public release | #18 |
 | Task text search (`%word%`) cannot use a B-tree index | Projects are small in the MVP; `unaccent` + `ILIKE` is enough | Slow search on projects with many thousands of tasks | When a project passes ~10k tasks: add a `pg_trgm` GIN index on `unaccent(title)` | #20 |
+
+**Reviews**
+- 2026-10-08, end of milestone 6: label name uniqueness paid in #69 (unique index on `(project_id, lower(name))`); text search renewed, its condition (~10k tasks per project) is far from being met.
 
 ---
 
@@ -17,5 +19,7 @@ Cada atajo que se acepta a propósito se anota aquí, para que sea una decisión
 
 | Qué | Por qué se aceptó | Riesgo | Pagar para (fecha o evento) | Issue |
 |---|---|---|---|---|
-| Los nombres de etiqueta son únicos por proyecto solo en el caso de uso (sin índice único) | Impacto bajo; un índice único sin distinguir mayúsculas requiere un índice funcional sobre `lower(name)` | Dos creaciones simultáneas con el mismo nombre podrían tener éxito ambas | Cuando se creen etiquetas a la vez en la práctica, o antes de la primera versión pública | #18 |
 | La búsqueda de texto de tareas (`%palabra%`) no puede usar un índice B-tree | Los proyectos son pequeños en el MVP; `unaccent` + `ILIKE` basta | Búsqueda lenta en proyectos con muchos miles de tareas | Cuando un proyecto pase de ~10k tareas: añadir un índice GIN `pg_trgm` sobre `unaccent(title)` | #20 |
+
+**Revisiones**
+- 2026-10-08, cierre del hito 6: unicidad de nombres de etiqueta pagada en #69 (índice único sobre `(project_id, lower(name))`); búsqueda de texto renovada, su condición (~10k tareas por proyecto) está lejos de cumplirse.
