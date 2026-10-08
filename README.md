@@ -249,6 +249,7 @@ Every error is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) ProblemDetails
 | 400 | Invalid request; `errors` lists the problems per field |
 | 401 / 403 | Not authenticated / not allowed |
 | 404 | Not found, or not visible to the current user |
+| 405 | The route exists but not with this HTTP method (the `Allow` header lists the valid ones) |
 | 409 | Conflicts with existing data (duplicate value, concurrent change) |
 | 422 | Valid request that breaks a business rule |
 
@@ -522,6 +523,7 @@ Todos los errores son ProblemDetails ([RFC 9457](https://www.rfc-editor.org/rfc/
 | 400 | Petición no válida; `errors` lista los problemas por campo |
 | 401 / 403 | Sin autenticar / sin permiso |
 | 404 | No existe, o el usuario actual no puede verlo |
+| 405 | La ruta existe pero no con este método HTTP (la cabecera `Allow` lista los válidos) |
 | 409 | Choca con datos existentes (valor duplicado, cambio concurrente) |
 | 422 | Petición válida que incumple una regla de negocio |
 
