@@ -22,10 +22,15 @@ internal sealed record NotFoundFailureReason(string Code, string Title)
 /// <summary>
 /// Answers 404 instead of 403 when authorization failed because the user cannot see the resource at all,
 /// so outsiders cannot even tell whether it exists. Users who can see it but lack a permission still get 403.
+/// Requests that reach no endpoint (unknown route, or a method the route does not accept) are not asked to log in:
+/// routing answers them with 404 or 405.
 /// </summary>
 internal sealed class NotFoundAuthorizationResultHandler(IProblemDetailsService problemDetailsService)
     : IAuthorizationMiddlewareResultHandler
 {
+    /// <summary>Display name of the endpoint routing selects when the path exists but the HTTP method does not.</summary>
+    private const string MethodNotAllowedEndpoint = "405 HTTP Method Not Supported";
+
     private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new();
 
     public async Task HandleAsync(
@@ -34,6 +39,13 @@ internal sealed class NotFoundAuthorizationResultHandler(IProblemDetailsService 
         AuthorizationPolicy policy,
         PolicyAuthorizationResult authorizeResult)
     {
+        // The fallback policy protects every real endpoint; a request that matches none has nothing to protect.
+        if (!authorizeResult.Succeeded && MatchesNoEndpoint(context))
+        {
+            await next(context);
+            return;
+        }
+
         var notFound = authorizeResult.Forbidden
             ? authorizeResult.AuthorizationFailure?.FailureReasons
                 .OfType<NotFoundFailureReason.NotFoundReason>()
@@ -59,4 +71,7 @@ internal sealed class NotFoundAuthorizationResultHandler(IProblemDetailsService 
             },
         });
     }
+
+    private static bool MatchesNoEndpoint(HttpContext context) =>
+        context.GetEndpoint() is not { } endpoint || endpoint.DisplayName == MethodNotAllowedEndpoint;
 }

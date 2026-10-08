@@ -92,6 +92,33 @@ public sealed class ErrorResponseTests(ProjectFlowApiFactory api)
     }
 
     [Fact]
+    public async Task Wrong_method_returns_405_even_without_a_token()
+    {
+        var response = await api.CreateClient().GetAsync("/api/auth/login");
+
+        await AssertProblemAsync(response, HttpStatusCode.MethodNotAllowed, "Request.MethodNotAllowed");
+        Assert.Contains("POST", response.Content.Headers.Allow);
+    }
+
+    [Fact]
+    public async Task Wrong_method_returns_405_with_a_token()
+    {
+        var user = await api.CreateUserAsync();
+
+        var response = await user.Client.DeleteAsync("/api/organizations");
+
+        await AssertProblemAsync(response, HttpStatusCode.MethodNotAllowed, "Request.MethodNotAllowed");
+    }
+
+    [Fact]
+    public async Task Unknown_route_returns_404_even_without_a_token()
+    {
+        var response = await api.CreateClient().GetAsync("/api/does-not-exist");
+
+        await AssertProblemAsync(response, HttpStatusCode.NotFound, "Resource.NotFound");
+    }
+
+    [Fact]
     public async Task Malformed_json_returns_400_problem_details()
     {
         using var content = new StringContent("{ \"email\": ", Encoding.UTF8, "application/json");
