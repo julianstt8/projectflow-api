@@ -43,6 +43,7 @@ public sealed class TasksController(ISender sender) : ApiControllerBase
                 request.PageSize)),
             cancellationToken));
 
+    /// <summary>A task with its key (e.g. <c>WEB-12</c>) and labels.</summary>
     [HttpGet("{taskId:guid}")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<TaskResponse>(StatusCodes.Status200OK)]

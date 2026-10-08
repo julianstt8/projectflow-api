@@ -11,6 +11,7 @@ namespace ProjectFlow.Api.Controllers;
 [Route("api/organizations/{organizationId:guid}/projects/{projectId:guid}")]
 public sealed class LabelsController(ISender sender) : ApiControllerBase
 {
+    /// <summary>Labels of the project, by name.</summary>
     [HttpGet("labels")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<IReadOnlyList<LabelResponse>>(StatusCodes.Status200OK)]
@@ -34,6 +35,7 @@ public sealed class LabelsController(ISender sender) : ApiControllerBase
             : ErrorResult(result.Error);
     }
 
+    /// <summary>Renames a label or changes its color.</summary>
     [HttpPut("labels/{labelId:guid}")]
     [RequireProjectPermission(ProjectPermission.EditProject)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -18,6 +18,7 @@ public sealed class EpicsController(ISender sender) : ApiControllerBase
     public async Task<IActionResult> List(Guid organizationId, Guid projectId, CancellationToken cancellationToken) =>
         Ok(await sender.Send(new GetEpicsQuery(projectId), cancellationToken));
 
+    /// <summary>An epic with its progress.</summary>
     [HttpGet("{epicId:guid}")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<EpicResponse>(StatusCodes.Status200OK)]
@@ -29,6 +30,7 @@ public sealed class EpicsController(ISender sender) : ApiControllerBase
         return result.IsSuccess ? Ok(result.Value) : ErrorResult(result.Error);
     }
 
+    /// <summary>Creates an epic. Project managers and admins only.</summary>
     [HttpPost]
     [RequireProjectPermission(ProjectPermission.ManageEpics)]
     [ProducesResponseType<EpicResponse>(StatusCodes.Status201Created)]
@@ -44,6 +46,7 @@ public sealed class EpicsController(ISender sender) : ApiControllerBase
             : ErrorResult(result.Error);
     }
 
+    /// <summary>Renames an epic or changes its description.</summary>
     [HttpPut("{epicId:guid}")]
     [RequireProjectPermission(ProjectPermission.ManageEpics)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -64,6 +67,7 @@ public sealed class EpicsController(ISender sender) : ApiControllerBase
     public Task<IActionResult> Close(Guid organizationId, Guid projectId, Guid epicId, CancellationToken cancellationToken) =>
         SendAsync(new CloseEpicCommand(projectId, epicId), cancellationToken);
 
+    /// <summary>Reopens a closed epic so tasks can be linked to it again.</summary>
     [HttpPost("{epicId:guid}/reopen")]
     [RequireProjectPermission(ProjectPermission.ManageEpics)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

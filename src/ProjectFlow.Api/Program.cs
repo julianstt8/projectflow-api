@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Mediator;
 using ProjectFlow.Api.Authentication;
 using ProjectFlow.Api.ErrorHandling;
+using ProjectFlow.Api.OpenApi;
 using ProjectFlow.Api.Organizations;
 using ProjectFlow.Application;
 using ProjectFlow.Application.Abstractions;
@@ -29,7 +30,7 @@ builder.AddJwtAuthentication();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-builder.Services.AddOpenApi();
+builder.Services.AddProjectFlowOpenApi();
 builder.Services.AddProjectFlowProblemDetails();
 builder.Services.AddHealthChecks();
 
@@ -40,7 +41,7 @@ app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi().AllowAnonymous();
+    app.MapProjectFlowApiReference();
 
     if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
     {

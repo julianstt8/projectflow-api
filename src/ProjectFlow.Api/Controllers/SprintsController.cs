@@ -11,12 +11,14 @@ namespace ProjectFlow.Api.Controllers;
 [Route("api/organizations/{organizationId:guid}/projects/{projectId:guid}/sprints")]
 public sealed class SprintsController(ISender sender) : ApiControllerBase
 {
+    /// <summary>Sprints of the project with their task count, dated ones first.</summary>
     [HttpGet]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<IReadOnlyList<SprintResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> List(Guid organizationId, Guid projectId, CancellationToken cancellationToken) =>
         Ok(await sender.Send(new GetSprintsQuery(projectId), cancellationToken));
 
+    /// <summary>A sprint with its task count.</summary>
     [HttpGet("{sprintId:guid}")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<SprintResponse>(StatusCodes.Status200OK)]

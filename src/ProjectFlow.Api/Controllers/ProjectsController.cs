@@ -68,6 +68,7 @@ public sealed class ProjectsController(ISender sender) : ApiControllerBase
     public Task<IActionResult> Archive(Guid organizationId, Guid projectId, CancellationToken cancellationToken) =>
         SendAsync(new ArchiveProjectCommand(projectId), cancellationToken);
 
+    /// <summary>Unarchives a project so it can be changed again.</summary>
     [HttpPost("{projectId:guid}/unarchive")]
     [RequireProjectPermission(ProjectPermission.EditProject)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
