@@ -54,6 +54,14 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<DevelopmentDataSeeder>();
 
+        // Public demo only (ADR 0010): restore the demo data when it gets older than the configured interval.
+        if (configuration.GetValue<int>($"{DemoOptions.SectionName}:{nameof(DemoOptions.ResetIntervalHours)}") > 0)
+        {
+            services.AddOptions<DemoOptions>().BindConfiguration(DemoOptions.SectionName);
+            services.AddScoped<DemoDataReset>();
+            services.AddHostedService<DemoDataResetService>();
+        }
+
         // Validated at startup: the API refuses to start with a missing or too short signing key.
         services.AddOptions<JwtOptions>()
             .BindConfiguration(JwtOptions.SectionName)

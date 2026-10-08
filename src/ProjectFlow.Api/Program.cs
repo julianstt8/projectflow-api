@@ -44,19 +44,20 @@ app.UseProjectFlowRequestLogging();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-if (app.Environment.IsDevelopment())
+// Off by default outside Development; the public demo turns them on by configuration (ADR 0010).
+if (app.Configuration.GetValue("ApiReference:Enabled", app.Environment.IsDevelopment()))
 {
     app.MapProjectFlowApiReference();
+}
 
-    if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
-    {
-        await app.Services.ApplyMigrationsAsync();
-    }
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
+    await app.Services.ApplyMigrationsAsync();
+}
 
-    if (app.Configuration.GetValue<bool>("Database:SeedOnStartup"))
-    {
-        await app.Services.SeedDevelopmentDataAsync();
-    }
+if (app.Configuration.GetValue<bool>("Database:SeedOnStartup"))
+{
+    await app.Services.SeedDevelopmentDataAsync();
 }
 
 app.UseHttpsRedirection();

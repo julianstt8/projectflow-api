@@ -20,10 +20,34 @@ public sealed class PostgreSqlFixture : IAsyncLifetime
     public Task DisposeAsync() => _container.DisposeAsync().AsTask();
 
     /// <summary>Creates a context that works inside <paramref name="organizationId"/> (or no organization).</summary>
-    public ApplicationDbContext CreateDbContext(Guid? organizationId) =>
+    public ApplicationDbContext CreateDbContext(Guid? organizationId) => CreateDbContext(_container.GetConnectionString(), organizationId);
+
+    /// <summary>
+    /// Creates and migrates a separate database in the same container, for tests that empty whole tables
+    /// and must not touch the data of the other tests. Returns its connection string.
+    /// </summary>
+    public async Task<string> CreateIsolatedDatabaseAsync()
+    {
+        var name = $"isolated_{Guid.NewGuid():N}";
+        await using (var connection = new Npgsql.NpgsqlConnection(_container.GetConnectionString()))
+        {
+            await connection.OpenAsync();
+
+            // CREATE DATABASE takes no parameters; the name is generated above, never input.
+            await using var command = new Npgsql.NpgsqlCommand($"CREATE DATABASE {name}", connection);
+            await command.ExecuteNonQueryAsync();
+        }
+
+        var connectionString = new Npgsql.NpgsqlConnectionStringBuilder(_container.GetConnectionString()) { Database = name }.ConnectionString;
+        await using var isolated = CreateDbContext(connectionString, organizationId: null);
+        await isolated.Database.MigrateAsync();
+        return connectionString;
+    }
+
+    public static ApplicationDbContext CreateDbContext(string connectionString, Guid? organizationId) =>
         new(
             new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseNpgsql(_container.GetConnectionString())
+                .UseNpgsql(connectionString)
                 .UseSnakeCaseNamingConvention()
                 .Options,
             new TestCurrentOrganization(organizationId));

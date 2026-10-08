@@ -1,0 +1,30 @@
+# Public demo of ProjectFlow API on Render (free web service) with PostgreSQL on Neon. See ADR 0010.
+# Secrets never live here: Render generates the JWT key and asks for the Neon connection string on creation.
+services:
+  - type: web
+    name: projectflow-api
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    autoDeployTrigger: checksPass # deploy main only when CI is green
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED # Render terminates HTTPS in its proxy
+        value: "true"
+      - key: PORT
+        value: "8080"
+      - key: ApiReference__Enabled
+        value: "true"
+      - key: Database__MigrateOnStartup
+        value: "true"
+      - key: Demo__ResetIntervalHours # restore the demo data once a day
+        value: "24"
+      - key: Jwt__SigningKey
+        generateValue: true
+      - key: ConnectionStrings__Default # Neon direct (not pooled) connection string, entered in the dashboard
+        sync: false

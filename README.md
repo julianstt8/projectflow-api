@@ -130,6 +130,16 @@ In Development, Docker Compose loads fictional demo data once: two organizations
 | frank.admin@example.com | Globex admin, project manager (DATA) |
 | grace.dev@example.com | Developer (DATA) |
 
+### Public demo (Render + Neon)
+
+[`render.yaml`](render.yaml) describes the public demo: the Docker image on a free [Render](https://render.com) web service and PostgreSQL on a free [Neon](https://neon.com) project ([ADR 0010](docs/adr/0010-public-demo-on-render-and-neon.md)). The demo runs in Production with the API reference turned on, the demo data above, and a **daily reset** that restores that data. It sleeps after 15 minutes without traffic, so the first request after a pause takes about a minute. Render deploys `main` only when CI is green.
+
+To deploy your own copy:
+
+1. Create a free project on Neon (PostgreSQL 17) and copy its **direct** connection string (not the pooled one) in .NET format: `Host=<host>;Database=<db>;Username=<user>;Password=<password>;SSL Mode=Require`.
+2. On Render choose **New → Blueprint** and connect this repository. Render reads `render.yaml`, generates the JWT signing key and asks for `ConnectionStrings__Default`: paste the Neon connection string. No secret is stored in the repository.
+3. The first deploy applies the migrations and loads the demo data. The reference is at `https://<service>.onrender.com/scalar` and the health check at `/health`.
+
 ## API tour
 
 Real requests and responses against the demo data (ids shortened).
@@ -403,6 +413,16 @@ En Development, Docker Compose carga una sola vez datos de ejemplo ficticios: do
 | elena.viewer@example.com | Observadora (WEB) |
 | frank.admin@example.com | Admin de Globex, jefe de proyecto (DATA) |
 | grace.dev@example.com | Desarrolladora (DATA) |
+
+#### Demo pública (Render + Neon)
+
+[`render.yaml`](render.yaml) describe la demo pública: la imagen Docker en un servicio web gratis de [Render](https://render.com) y PostgreSQL en un proyecto gratis de [Neon](https://neon.com) ([ADR 0010](docs/adr/0010-public-demo-on-render-and-neon.md)). La demo corre en Production con la referencia de la API activada, los datos de ejemplo de arriba y un **reinicio diario** que restaura esos datos. Se duerme tras 15 minutos sin tráfico, así que la primera petición después de una pausa tarda alrededor de un minuto. Render solo despliega `main` cuando el CI está en verde.
+
+Para desplegar tu propia copia:
+
+1. Crea un proyecto gratis en Neon (PostgreSQL 17) y copia su cadena de conexión **directa** (no la del pooler) en formato .NET: `Host=<host>;Database=<db>;Username=<usuario>;Password=<contraseña>;SSL Mode=Require`.
+2. En Render elige **New → Blueprint** y conecta este repositorio. Render lee `render.yaml`, genera la clave de firma JWT y pide `ConnectionStrings__Default`: pega la cadena de conexión de Neon. No se guarda ningún secreto en el repositorio.
+3. El primer despliegue aplica las migraciones y carga los datos de ejemplo. La referencia queda en `https://<servicio>.onrender.com/scalar` y el health check en `/health`.
 
 ### Recorrido por la API
 

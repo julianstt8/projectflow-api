@@ -265,6 +265,20 @@ public class ApiReferenceTests(ProjectFlowApiFactory api)
         Assert.Contains((await client.GetAsync("/")).StatusCode, notExposed);
     }
 
+    [Fact]
+    public async Task The_public_demo_can_expose_the_reference_by_configuration()
+    {
+        using var demo = api.WithWebHostBuilder(builder => builder
+            .UseEnvironment("Production")
+            .UseSetting("Jwt:SigningKey", new string('k', 64))
+            .UseSetting("ApiReference:Enabled", "true"));
+        var client = demo.CreateClient();
+
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/openapi/en.json")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/openapi/es.json")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/scalar/")).StatusCode);
+    }
+
     private async Task<JsonElement> DocumentAsync(string language)
     {
         var response = await api.CreateClient().GetAsync($"/openapi/{language}.json");
