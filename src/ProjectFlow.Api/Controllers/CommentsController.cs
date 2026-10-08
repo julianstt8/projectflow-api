@@ -67,4 +67,6 @@ public sealed class CommentsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Text of a comment.</summary>
+/// <param name="Body">The comment, up to 5000 characters, in any language (accents, ñ and emoji are kept as written).</param>
 public sealed record CommentRequest(string Body);

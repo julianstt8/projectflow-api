@@ -10,6 +10,8 @@ using ProjectFlow.Application.Authentication.Register;
 
 namespace ProjectFlow.Api.Controllers;
 
+/// <summary>Registration, login, token refresh and logout (RF-01).</summary>
+/// <param name="sender">Sends commands and queries to their handlers.</param>
 [Route("api/auth")]
 public sealed class AuthController(ISender sender) : ApiControllerBase
 {
@@ -77,4 +79,8 @@ public sealed class AuthController(ISender sender) : ApiControllerBase
             User.FindFirst(JwtRegisteredClaimNames.Name)!.Value);
 }
 
+/// <summary>The user identified by the access token.</summary>
+/// <param name="Id">User id.</param>
+/// <param name="Email">E-mail of the user.</param>
+/// <param name="FullName">Full name of the user.</param>
 public sealed record CurrentUserResponse(Guid Id, string Email, string FullName);

@@ -14,6 +14,7 @@ public static class OrganizationPolicies
     /// <summary>The current user is an admin of the organization in the route.</summary>
     public const string Admin = "OrganizationAdmin";
 
+    /// <summary>Registers the <see cref="Member"/> and <see cref="Admin"/> policies.</summary>
     public static AuthorizationBuilder AddOrganizationPolicies(this AuthorizationBuilder builder) =>
         builder
             .AddPolicy(Member, policy => policy
@@ -24,6 +25,8 @@ public static class OrganizationPolicies
                 .AddRequirements(new OrganizationRoleRequirement(OrganizationRole.Admin)));
 }
 
+/// <summary>Requires membership of the organization in the route, optionally with a role.</summary>
+/// <param name="RequiredRole">The role required, or <see langword="null"/> for any member.</param>
 public sealed record OrganizationRoleRequirement(OrganizationRole? RequiredRole) : IAuthorizationRequirement;
 
 /// <summary>
