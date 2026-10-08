@@ -93,6 +93,11 @@ public sealed class OrganizationsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>A registered user to add to the organization.</summary>
+/// <param name="Email">E-mail the user registered with.</param>
+/// <param name="Role">Organization role: <c>Admin</c> or <c>Member</c>.</param>
 public sealed record AddMemberRequest(string Email, OrganizationRole Role);
 
+/// <summary>New organization role of a member.</summary>
+/// <param name="Role">Organization role: <c>Admin</c> or <c>Member</c>.</param>
 public sealed record ChangeMemberRoleRequest(OrganizationRole Role);

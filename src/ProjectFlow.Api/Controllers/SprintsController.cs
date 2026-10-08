@@ -11,12 +11,14 @@ namespace ProjectFlow.Api.Controllers;
 [Route("api/organizations/{organizationId:guid}/projects/{projectId:guid}/sprints")]
 public sealed class SprintsController(ISender sender) : ApiControllerBase
 {
+    /// <summary>Sprints of the project with their task count, dated ones first.</summary>
     [HttpGet]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<IReadOnlyList<SprintResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> List(Guid organizationId, Guid projectId, CancellationToken cancellationToken) =>
         Ok(await sender.Send(new GetSprintsQuery(projectId), cancellationToken));
 
+    /// <summary>A sprint with its task count.</summary>
     [HttpGet("{sprintId:guid}")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<SprintResponse>(StatusCodes.Status200OK)]
@@ -86,4 +88,9 @@ public sealed class SprintsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Data of a sprint.</summary>
+/// <param name="Name">Sprint name, up to 100 characters.</param>
+/// <param name="Goal">Optional goal, up to 500 characters.</param>
+/// <param name="StartDate">Optional start date; defaults to the day the sprint starts.</param>
+/// <param name="EndDate">Optional end date, not earlier than the start date.</param>
 public sealed record SprintRequest(string Name, string? Goal, DateOnly? StartDate, DateOnly? EndDate);

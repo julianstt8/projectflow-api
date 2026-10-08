@@ -43,6 +43,7 @@ public sealed class TasksController(ISender sender) : ApiControllerBase
                 request.PageSize)),
             cancellationToken));
 
+    /// <summary>A task with its key (e.g. <c>WEB-12</c>) and labels.</summary>
     [HttpGet("{taskId:guid}")]
     [RequireProjectPermission(ProjectPermission.ViewProject)]
     [ProducesResponseType<TaskResponse>(StatusCodes.Status200OK)]
@@ -166,6 +167,15 @@ public sealed class TasksController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Data of a new task. The current user is the reporter.</summary>
+/// <param name="Type"><c>Story</c>, <c>Bug</c> or <c>Task</c>.</param>
+/// <param name="Title">Title, up to 200 characters.</param>
+/// <param name="Description">Optional description, up to 10000 characters.</param>
+/// <param name="Priority"><c>Low</c>, <c>Medium</c>, <c>High</c> or <c>Critical</c>.</param>
+/// <param name="StoryPoints">Optional estimate from 0 to 100.</param>
+/// <param name="AssigneeId">Optional assignee: an organization admin, project manager or developer of the project.</param>
+/// <param name="SprintId">Optional sprint of the project; none means the backlog.</param>
+/// <param name="EpicId">Optional open epic of the project.</param>
 public sealed record CreateTaskRequest(
     TaskType Type,
     string Title,
@@ -176,38 +186,63 @@ public sealed record CreateTaskRequest(
     Guid? SprintId,
     Guid? EpicId);
 
+/// <summary>New details of a task.</summary>
+/// <param name="Type"><c>Story</c>, <c>Bug</c> or <c>Task</c>.</param>
+/// <param name="Title">Title, up to 200 characters.</param>
+/// <param name="Description">Optional description, up to 10000 characters.</param>
+/// <param name="Priority"><c>Low</c>, <c>Medium</c>, <c>High</c> or <c>Critical</c>.</param>
+/// <param name="StoryPoints">Optional estimate from 0 to 100.</param>
 public sealed record UpdateTaskRequest(TaskType Type, string Title, string? Description, TaskPriority Priority, int? StoryPoints);
 
+/// <summary>New assignee of a task.</summary>
+/// <param name="AssigneeId">Someone who works in the project, or <c>null</c> to unassign.</param>
 public sealed record AssignTaskRequest(Guid? AssigneeId);
 
+/// <summary>New sprint of a task.</summary>
+/// <param name="SprintId">A sprint of the project that is not completed, or <c>null</c> for the backlog.</param>
 public sealed record MoveTaskToSprintRequest(Guid? SprintId);
 
+/// <summary>New epic of a task.</summary>
+/// <param name="EpicId">An open epic of the project, or <c>null</c> to unlink.</param>
 public sealed record SetTaskEpicRequest(Guid? EpicId);
 
+/// <summary>Next status of a task (RF-07).</summary>
+/// <param name="Status"><c>ToDo</c>, <c>InProgress</c>, <c>Review</c> or <c>Done</c>; only the workflow transitions are allowed.</param>
 public sealed record ChangeTaskStatusRequest(TaskItemStatus Status);
 
 /// <summary>Query string of the task search (RF-11).</summary>
 public sealed class TaskSearchRequest
 {
+    /// <summary>Only these statuses (repeat the parameter for several).</summary>
     public TaskItemStatus[]? Status { get; init; }
 
+    /// <summary>Only tasks assigned to this user.</summary>
     public Guid? AssigneeId { get; init; }
 
+    /// <summary>Only tasks without assignee (instead of <c>assigneeId</c>).</summary>
     public bool Unassigned { get; init; }
 
+    /// <summary>Only tasks of this sprint.</summary>
     public Guid? SprintId { get; init; }
 
+    /// <summary>Only tasks outside any sprint (instead of <c>sprintId</c>).</summary>
     public bool Backlog { get; init; }
 
+    /// <summary>Only tasks of this epic.</summary>
     public Guid? EpicId { get; init; }
 
+    /// <summary>Only tasks with this label.</summary>
     public Guid? LabelId { get; init; }
 
+    /// <summary>Words of the title, ignoring case and accents, or a task key or number (<c>WEB-12</c>, <c>12</c>).</summary>
     public string? Q { get; init; }
 
+    /// <summary><c>number</c> (default), <c>-number</c>, <c>updatedAt</c> or <c>-updatedAt</c>.</summary>
     public string? Sort { get; init; }
 
+    /// <summary>Page number, from 1.</summary>
     public int Page { get; init; } = 1;
 
+    /// <summary>Results per page, from 1 to 100 (default 25).</summary>
     public int PageSize { get; init; } = 25;
 }
