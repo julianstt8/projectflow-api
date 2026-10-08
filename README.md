@@ -19,6 +19,7 @@ Enterprise REST API for software project management (mini-Jira): organizations, 
 - [Roles and permissions](#roles-and-permissions)
 - [Errors](#errors)
 - [Tests and quality](#tests-and-quality)
+- [License](#license)
 
 ## Features
 
@@ -284,6 +285,10 @@ Tests that need a database start a throwaway PostgreSQL 17 with **Testcontainers
 
 Every pull request runs in CI (GitHub Actions): formatting, build with **warnings as errors**, all tests with a coverage summary, the Docker image, vulnerable NuGet packages and a secret scan (gitleaks). Dependabot proposes updates every week. Every change follows the two gates of [`docs/engineering-workflow.md`](docs/engineering-workflow.md) (plan before coding, review checklist after), and shortcuts accepted on purpose are tracked in [`docs/tech-debt.md`](docs/tech-debt.md).
 
+## License
+
+[MIT](LICENSE) © 2026 Julian Stiven Londoño Perez. You can use, copy and modify the code, keeping the copyright notice.
+
 ---
 
 ## Español
@@ -305,6 +310,7 @@ API REST empresarial para gestionar proyectos de software (estilo mini-Jira): or
 - [Roles y permisos](#roles-y-permisos)
 - [Errores](#errores)
 - [Pruebas y calidad](#pruebas-y-calidad)
+- [Licencia](#licencia)
 
 ### Funcionalidades
 
@@ -569,3 +575,7 @@ Las pruebas que necesitan base de datos arrancan un PostgreSQL 17 desechable con
 | `ProjectFlow.ArchitectureTests` | Dependencias entre capas |
 
 Cada pull request pasa por el CI (GitHub Actions): formato, compilación con **advertencias como errores**, todas las pruebas con un resumen de cobertura, la imagen Docker, paquetes NuGet con vulnerabilidades y un escaneo de secretos (gitleaks). Dependabot propone actualizaciones cada semana. Cada cambio sigue las dos puertas de [`docs/engineering-workflow.md`](docs/engineering-workflow.md) (plan antes de programar, lista de revisión después), y los atajos aceptados a propósito se registran en [`docs/tech-debt.md`](docs/tech-debt.md).
+
+### Licencia
+
+[MIT](LICENSE) © 2026 Julian Stiven Londoño Perez. Puedes usar, copiar y modificar el código, manteniendo el aviso de copyright.
