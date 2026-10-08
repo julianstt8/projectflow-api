@@ -62,6 +62,7 @@ public sealed class SprintsController(ISender sender) : ApiControllerBase
     /// <summary>Starts a planned sprint. Fails with 409 if the project already has an active sprint.</summary>
     [HttpPost("{sprintId:guid}/start")]
     [RequireProjectPermission(ProjectPermission.ManageSprints)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
