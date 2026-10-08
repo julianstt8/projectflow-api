@@ -43,6 +43,7 @@ public sealed class LabelsController(ISender sender) : ApiControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public Task<IActionResult> Update(Guid organizationId, Guid projectId, Guid labelId, LabelRequest request, CancellationToken cancellationToken) =>
         SendAsync(new UpdateLabelCommand(projectId, labelId, request.Name, request.Color), cancellationToken);
 
@@ -52,6 +53,7 @@ public sealed class LabelsController(ISender sender) : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public Task<IActionResult> Delete(Guid organizationId, Guid projectId, Guid labelId, CancellationToken cancellationToken) =>
         SendAsync(new DeleteLabelCommand(projectId, labelId), cancellationToken);
 
@@ -71,6 +73,7 @@ public sealed class LabelsController(ISender sender) : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public Task<IActionResult> RemoveFromTask(Guid organizationId, Guid projectId, Guid taskId, Guid labelId, CancellationToken cancellationToken) =>
         SendAsync(new RemoveTaskLabelCommand(organizationId, projectId, taskId, labelId), cancellationToken);
 

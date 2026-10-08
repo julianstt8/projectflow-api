@@ -1,7 +1,7 @@
 # ADR 0007: API reference with built-in OpenAPI and Scalar · Referencia de la API con OpenAPI integrado y Scalar
 
 - **Date · Fecha:** 2026-10-07
-- **Status · Estado:** Accepted
+- **Status · Estado:** Accepted; the source of the texts (XML comments) was replaced by [ADR 0008](0008-bilingual-api-reference-catalog.md) · el origen de los textos (comentarios XML) lo reemplazó el ADR 0008
 
 ## English
 

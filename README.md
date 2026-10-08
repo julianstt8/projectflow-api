@@ -33,7 +33,7 @@ With Docker (API + PostgreSQL, no other setup needed):
 docker compose up --build
 ```
 
-The API listens on http://localhost:5080: open it in the browser for the **interactive API reference** (Scalar), where every endpoint is documented and can be tried (log in, then paste the access token as Bearer token). The OpenAPI document is at `/openapi/v1.json`; both are available in Development only. Health check: `GET /health`. Local defaults can be overridden with a `.env` file based on `.env.example`.
+The API listens on http://localhost:5080: open it in the browser for the **interactive API reference** (Scalar), in English or Spanish, where every endpoint explains what it does, who can call it, each error code it can return and example requests and responses, and can be tried (log in, then paste the access token as Bearer token). The OpenAPI documents are at `/openapi/en.json` and `/openapi/es.json`; all of them are available in Development only. Health check: `GET /health`. Local defaults can be overridden with a `.env` file based on `.env.example`.
 
 With the [.NET 10 SDK](https://dotnet.microsoft.com/download):
 
@@ -157,7 +157,7 @@ Con Docker (API + PostgreSQL, sin más configuración):
 docker compose up --build
 ```
 
-La API queda en http://localhost:5080: ábrela en el navegador para ver la **referencia interactiva de la API** (Scalar), donde cada endpoint está documentado y se puede probar (haz login y pega el access token como Bearer token). El documento OpenAPI está en `/openapi/v1.json`; ambos solo en Development. Health check: `GET /health`. Los valores locales por defecto se pueden cambiar con un archivo `.env` basado en `.env.example`.
+La API queda en http://localhost:5080: ábrela en el navegador para ver la **referencia interactiva de la API** (Scalar), en inglés o en español, donde cada endpoint explica qué hace, quién puede llamarlo, cada código de error que puede devolver y ejemplos de petición y respuesta, y se puede probar (haz login y pega el access token como Bearer token). Los documentos OpenAPI están en `/openapi/en.json` y `/openapi/es.json`; todo solo en Development. Health check: `GET /health`. Los valores locales por defecto se pueden cambiar con un archivo `.env` basado en `.env.example`.
 
 Con el [SDK de .NET 10](https://dotnet.microsoft.com/download):
 
