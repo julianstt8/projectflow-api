@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Logging;
 using ProjectFlow.Api.IntegrationTests.Infrastructure;
@@ -59,6 +60,15 @@ public class ObservabilityTests(ProjectFlowApiFactory api)
         Assert.DoesNotContain(email, everything);
         Assert.DoesNotContain(accessToken, everything);
         Assert.DoesNotContain("confidential-search-term", everything);
+    }
+
+    [Fact]
+    public async Task Health_checks_the_database()
+    {
+        var response = await api.CreateClient().GetAsync("/health");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Healthy", await response.Content.ReadAsStringAsync());
     }
 
     [Fact]

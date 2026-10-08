@@ -55,7 +55,7 @@ internal static class ObservabilitySetup
     {
         app.UseSerilogRequestLogging(options =>
         {
-            options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0} ms";
+            options.MessageTemplate = "HTTP {RequestMethod:l} {RequestPath:l} responded {StatusCode} in {Elapsed:0.0} ms";
             options.GetLevel = (context, _, exception) => exception is not null || context.Response.StatusCode >= 500
                 ? LogEventLevel.Error
                 : context.Request.Path.StartsWithSegments("/health") ? LogEventLevel.Verbose : LogEventLevel.Information;
