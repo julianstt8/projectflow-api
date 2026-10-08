@@ -88,4 +88,9 @@ public sealed class SprintsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Data of a sprint.</summary>
+/// <param name="Name">Sprint name, up to 100 characters.</param>
+/// <param name="Goal">Optional goal, up to 500 characters.</param>
+/// <param name="StartDate">Optional start date; defaults to the day the sprint starts.</param>
+/// <param name="EndDate">Optional end date, not earlier than the start date.</param>
 public sealed record SprintRequest(string Name, string? Goal, DateOnly? StartDate, DateOnly? EndDate);

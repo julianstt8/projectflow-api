@@ -14,13 +14,18 @@ namespace ProjectFlow.Api.Authorization;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
 public sealed class RequireProjectPermissionAttribute(ProjectPermission permission) : AuthorizeAttribute, IAuthorizationRequirementData
 {
+    /// <summary>Name of the route value that holds the project id.</summary>
     public const string ProjectRouteValue = "projectId";
 
+    /// <summary>The permission the endpoint requires.</summary>
     public ProjectPermission Permission { get; } = permission;
 
+    /// <inheritdoc/>
     public IEnumerable<IAuthorizationRequirement> GetRequirements() => [new ProjectPermissionRequirement(Permission)];
 }
 
+/// <summary>Requires a permission in the project of the route.</summary>
+/// <param name="Permission">The permission required.</param>
 public sealed record ProjectPermissionRequirement(ProjectPermission Permission) : IAuthorizationRequirement;
 
 /// <summary>

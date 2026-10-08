@@ -67,6 +67,16 @@ public class ApiReferenceTests(ProjectFlowApiFactory api)
     }
 
     [Fact]
+    public async Task Request_fields_are_described_from_the_xml_comments()
+    {
+        var schemas = (await DocumentAsync()).GetProperty("components").GetProperty("schemas");
+
+        var key = schemas.GetProperty("CreateProjectRequest").GetProperty("properties").GetProperty("key");
+
+        Assert.Contains("WEB-12", key.GetProperty("description").GetString());
+    }
+
+    [Fact]
     public async Task Scalar_reference_is_served_and_the_root_redirects_to_it()
     {
         var client = api.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions { AllowAutoRedirect = false });

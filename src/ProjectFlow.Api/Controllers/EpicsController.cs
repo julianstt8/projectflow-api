@@ -85,4 +85,7 @@ public sealed class EpicsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Data of an epic.</summary>
+/// <param name="Name">Epic name, up to 200 characters.</param>
+/// <param name="Description">Optional description, up to 5000 characters.</param>
 public sealed record EpicRequest(string Name, string? Description);

@@ -137,10 +137,22 @@ public sealed class ProjectsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Data of a new project.</summary>
+/// <param name="Key">Short code used in task keys (e.g. <c>WEB</c> in <c>WEB-12</c>): 2-10 letters or digits, starting with a letter, unique in the organization.</param>
+/// <param name="Name">Project name, up to 100 characters.</param>
+/// <param name="Description">Optional description, up to 2000 characters.</param>
 public sealed record CreateProjectRequest(string Key, string Name, string? Description);
 
+/// <summary>New name and description of a project.</summary>
+/// <param name="Name">Project name, up to 100 characters.</param>
+/// <param name="Description">Optional description, up to 2000 characters.</param>
 public sealed record UpdateProjectRequest(string Name, string? Description);
 
+/// <summary>A member of the organization to add to the project.</summary>
+/// <param name="Email">E-mail of a member of the organization.</param>
+/// <param name="Role">Project role: <c>ProjectManager</c>, <c>Developer</c> or <c>Viewer</c>.</param>
 public sealed record AddProjectMemberRequest(string Email, ProjectRole Role);
 
+/// <summary>New project role of a member.</summary>
+/// <param name="Role">Project role: <c>ProjectManager</c>, <c>Developer</c> or <c>Viewer</c>.</param>
 public sealed record ChangeProjectMemberRoleRequest(ProjectRole Role);

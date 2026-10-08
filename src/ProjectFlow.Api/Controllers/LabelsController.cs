@@ -82,4 +82,7 @@ public sealed class LabelsController(ISender sender) : ApiControllerBase
     }
 }
 
+/// <summary>Data of a label.</summary>
+/// <param name="Name">Label name, unique in the project ignoring case, up to 50 characters.</param>
+/// <param name="Color">Hex color such as <c>#1D76DB</c>.</param>
 public sealed record LabelRequest(string Name, string Color);

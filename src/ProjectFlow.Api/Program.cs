@@ -64,4 +64,5 @@ app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();
 
+/// <summary>Entry point. Public and partial so the integration tests can host the API.</summary>
 public partial class Program;

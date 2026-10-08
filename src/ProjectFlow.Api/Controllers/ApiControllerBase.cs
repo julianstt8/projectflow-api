@@ -4,6 +4,7 @@ using ProjectFlow.Domain.Common;
 
 namespace ProjectFlow.Api.Controllers;
 
+/// <summary>Base of every controller: turns expected failures (<see cref="Error"/>) into ProblemDetails.</summary>
 [ApiController]
 public abstract class ApiControllerBase : ControllerBase
 {
