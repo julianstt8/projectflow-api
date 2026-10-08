@@ -4,6 +4,8 @@
 
 Enterprise REST API for software project management (mini-Jira): organizations, projects, sprints, epics, tasks, comments and labels, with JWT authentication, role-based access control, an audit log and task search.
 
+**Live demo**: [projectflow-api-8ybj.onrender.com/scalar](https://projectflow-api-8ybj.onrender.com/scalar), the interactive API reference in English or Spanish. Log in with any [demo user](#demo-data) (password `ProjectFlow-Dev-2026`) and try every endpoint. The data is fictional and restored every day; after a quiet period the first request takes about a minute while the free service wakes up.
+
 **What it shows**: Clean Architecture with CQRS, a rich domain model, security by default (every endpoint authenticated, roles checked against the database on every request, organizations isolated from each other), consistency under concurrency, an insert-only audit log, structured logs, a bilingual interactive API reference, and more than 500 tests against a real PostgreSQL.
 
 ## Contents
@@ -287,6 +289,8 @@ Every pull request runs in CI (GitHub Actions): formatting, build with **warning
 ## Español
 
 API REST empresarial para gestionar proyectos de software (estilo mini-Jira): organizaciones, proyectos, sprints, épicas, tareas, comentarios y etiquetas, con autenticación JWT, control de acceso por roles, registro de auditoría y búsqueda de tareas.
+
+**Demo en vivo**: [projectflow-api-8ybj.onrender.com/scalar](https://projectflow-api-8ybj.onrender.com/scalar), la referencia interactiva de la API en inglés o español. Inicia sesión con cualquier [usuario de ejemplo](#datos-de-ejemplo) (contraseña `ProjectFlow-Dev-2026`) y prueba cada endpoint. Los datos son ficticios y se restauran cada día; tras un rato sin uso, la primera petición tarda alrededor de un minuto mientras el servicio gratis despierta.
 
 **Qué demuestra**: Clean Architecture con CQRS, un modelo de dominio rico, seguridad por defecto (todos los endpoints autenticados, roles comprobados contra la base de datos en cada petición, organizaciones aisladas entre sí), consistencia ante concurrencia, un registro de auditoría solo de inserción, logs estructurados, una referencia interactiva de la API bilingüe y más de 500 pruebas contra un PostgreSQL real.
 
