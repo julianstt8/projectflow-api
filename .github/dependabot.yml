@@ -10,6 +10,18 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # The project targets .NET 10 (LTS). Moving to a new .NET major is a deliberate change, not a weekly update.
+    ignore:
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+        update-types: [version-update:semver-major]
+      - dependency-name: "Npgsql.EntityFrameworkCore.PostgreSQL"
+        update-types: [version-update:semver-major]
+      - dependency-name: "EFCore.NamingConventions"
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: "/"
@@ -24,3 +36,7 @@ updates:
       interval: weekly
     commit-message:
       prefix: "chore(docker)"
+    # The SDK and runtime images must stay on the .NET major in global.json and Directory.Build.props.
+    ignore:
+      - dependency-name: "dotnet/*"
+        update-types: [version-update:semver-major]

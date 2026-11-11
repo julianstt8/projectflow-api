@@ -94,3 +94,20 @@ jobs:
 
       - name: Build image
         run: docker build --tag projectflow-api:ci .
+
+      # Starts the image with PostgreSQL, as docker-compose does, so a runtime that cannot run the app fails here
+      # instead of in the Render deploy.
+      - name: Smoke test
+        run: |
+          docker compose up --detach --build
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://localhost:5080/health; then
+              docker compose down
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs api
+          docker compose down
+          echo "::error::The API did not answer /health. See the container log above."
+          exit 1
